@@ -1,0 +1,68 @@
+#!/usr/bin/env python
+import roslib; roslib.load_manifest("hrp2_bike")
+import rospy
+
+import roslib.packages
+
+from dynamic_graph_bridge.srv import *
+#from openhrp_bridge_msgs.srv import *
+from std_srvs.srv import *
+from geometry_msgs.msg import TransformStamped
+
+from time import sleep
+import subprocess
+import sys
+
+rospy.loginfo('Starting launcher')
+
+rospy.init_node('launcher', log_level=rospy.DEBUG)
+
+simulation = rospy.get_param('~simulation', False)
+
+
+pkgLocation = roslib.packages.get_pkg_dir('hrp2_bike')
+sotScriptsLocation = pkgLocation + "/scripts/"
+
+def launchScript(code,title,description = ""):
+    raw_input(title+':   '+description)
+    rospy.loginfo(title)
+    rospy.loginfo(code)
+    for line in code:
+        if line != '' and line[0] != '#':
+            print line
+            answer = runCommandClient(str(line))
+            rospy.logdebug(answer)
+            print answer
+    rospy.loginfo("...done with "+title)
+
+try:
+    rospy.loginfo(sotScriptsLocation)
+    # Read scripts.
+    initCode = open( sotScriptsLocation + "appli.py", "r").read().split("\n")
+    transitionCode = ("s()", )
+
+    rospy.loginfo("waiting for run_command")
+    rospy.wait_for_service("run_command")
+    rospy.loginfo("...ok")
+
+    # Create clients.
+    runCommandClient = rospy.ServiceProxy('run_command', RunCommand)
+    runCommandStartDynamicGraph = rospy.ServiceProxy(
+        'start_dynamic_graph', Empty)
+
+    rospy.loginfo("Stack of Tasks launched")
+
+    launchScript(initCode,'initialization')
+
+    rospy.loginfo("Start the controller")
+
+    except:
+        rospy.loginfo("Error while starting the Dynamic Graph. Catched and continue.")
+        raw_input("Catch an error while starting the dg. Check if you want to continue.")
+    rospy.loginfo("...done")
+
+    while True:
+        launchScript(transitionCode,'next stage')
+
+except rospy.ServiceException, e:
+    rospy.logerr("Service call failed: %s" % e)
