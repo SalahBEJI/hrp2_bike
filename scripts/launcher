@@ -55,7 +55,8 @@ try:
     launchScript(initCode,'initialization')
 
     rospy.loginfo("Start the controller")
-
+    try:
+        runCommandStartDynamicGraph()
     except:
         rospy.loginfo("Error while starting the Dynamic Graph. Catched and continue.")
         raw_input("Catch an error while starting the dg. Check if you want to continue.")

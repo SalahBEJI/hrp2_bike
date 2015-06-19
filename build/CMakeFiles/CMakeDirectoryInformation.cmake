@@ -17,6 +17,7 @@ SET(CMAKE_C_INCLUDE_PATH
   "/home/bsinivas/devel/ros_unstable/stacks/hrp2/openhrp_bridge_msgs/msg_gen/cpp/include"
   "/home/bsinivas/devel/ros_unstable/stacks/hrp2/openhrp_bridge_msgs/srv_gen/cpp/include"
   "/opt/ros/hydro/include"
+  "/usr/include/eigen3"
   )
 SET(CMAKE_CXX_INCLUDE_PATH ${CMAKE_C_INCLUDE_PATH})
 SET(CMAKE_Fortran_INCLUDE_PATH ${CMAKE_C_INCLUDE_PATH})
