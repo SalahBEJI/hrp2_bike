@@ -10,13 +10,16 @@
   <!-- mode should be dg_with_stabilizer -->
   <arg name="mode" default="dg_with_stabilizer" />
 
+  <!-- RVIZ start -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find hrp2_bike)/rviz_cfg/hrp2_bike.rviz">
+  </node>
+
   <!-- Load robot model and machine description -->
   <include file="$(find hrp2_bringup)/launch/geometric_simu.launch">
   </include>
 
   <!-- Initialize the SoT -->
   <node pkg="hrp2_bike" type="launcher" name="launcher">
-<!--    <param name="~simulation" value="$(arg simulation)" />-->
     <param name="~simulation" value="$(arg simulation)" />
   </node>
 
