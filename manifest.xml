@@ -7,7 +7,7 @@
   <author>Benoit Sinivassin</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/hrp2_bike</url>
+  <url>https://github.com/benwayne182/hrp2_bike</url>
 
     <rosdep name="boost"/>
     <rosdep name="eigen"/>

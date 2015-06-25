@@ -14,25 +14,20 @@ class Hrp2Bike(Application):
 
         self.sot=self.solver.sot
         self.robot=robot
-        self.initGeneralApplication()
 
-        self.initTasks()
+        self.initTasks(robot)
         self.initTaskGains()
         self.initialStack()
 
     def printSolver(self): #show tasks in solver controling the robot
         print self.solver
-    def initGeneralApplication(self):
-        from dynamic_graph.sot.application.velocity.precomputed_meta_tasks import initialize
-        self.solver = initialize(self.robot)
 
 
     #----------TASKS-------------------------------
-    def initTasks(self):
+    def initTasks(self,robot):
         self.initTaskBalance()
-        self.createTrunkTask(robot, trunk)
-        self.createBikeSittingTask(robot, bike-sitting)
-        self.createTasks()
+        self.createBikeSittingTask(robot, 'bike-sitting')
+        self.createTasks(robot)
 
     def createTrunkTask (self, robot, taskName, ingain=1.0):
         task = Task (taskName)
@@ -68,8 +63,9 @@ class Hrp2Bike(Application):
         self.features['gaze'].selec.value = '111000'
         self.featureCom.selec.value = '111'
 
-    def createTasks(self):
-        (self.tasks['trunk'],self.gains['trunk'])= createTrunkTask (self.robot, self, 'Tasktrunk')
+    def createTasks(self,robot):
+        (self.tasks['trunk'],self.gains['trunk'])= self.createTrunkTask(robot, 'trunk')
+        (self.tasks['bike-sitting'],self.gains['bike-sitting'])= self.createBikeSittingTask(robot, 'bike-sitting')
         self.taskRF      = self.tasks['left-ankle']
         self.taskLF      = self.tasks['right-ankle']
         self.taskCom     = self.tasks['com']
@@ -83,7 +79,7 @@ class Hrp2Bike(Application):
 
 
     def initTaskGains(self):
-        self.taskHalfStitting.gain.setByPoint(2,0.2,0.01,0.8)
+        self.taskHalfSitting.gain.setByPoint(2,0.2,0.01,0.8)
 
 
     #----------SOLVER------------------------------
@@ -114,14 +110,14 @@ class Hrp2Bike(Application):
 
     def initialStack(self):
         self.sot.clear()
-        self.push(self.tasksBalance)
+        self.push(self.taskBalance)
         self.push(self.taskTrunk)
         self.push(self.taskPosture)
 
     def goHalfSitting(self):
         self.featurePostureDes.errorIN.value = self.robot.halfSitting
         self.sot.clear()
-        self.push(self.tasksBalance)
+        self.push(self.taskBalance)
         self.push(self.taskPosture)
 
     def bikeSitting(self):
