@@ -37,5 +37,6 @@ include_directories(${Eigen_INCLUDE_DIRS})
 
 INSTALL(FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/scripts/cycling.py
-  DESTINATION ${PYTHON_SITELIB}/dynamic_graph/sot/application
+#  DESTINATION ${PYTHON_SITELIB}/dynamic_graph/sot/application
+  DESTINATION /home/bsinivas/devel/ros_unstable/install/lib/python2.7/site-packages/dynamic_graph/sot/application
   )

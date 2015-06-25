@@ -11,9 +11,10 @@ class Hrp2Bike(Application):
 
     def __init__(self,robot):
         Application.__init__(self,robot)
+
         self.sot=self.solver.sot
         self.robot=robot
-
+        self.initGeneralApplication()
 
         self.initTasks()
         self.initTaskGains()
@@ -21,7 +22,9 @@ class Hrp2Bike(Application):
 
     def printSolver(self): #show tasks in solver controling the robot
         print self.solver
-
+    def initGeneralApplication(self):
+        from dynamic_graph.sot.application.velocity.precomputed_meta_tasks import initialize
+        self.solver = initialize(self.robot)
 
 
     #----------TASKS-------------------------------
@@ -131,11 +134,10 @@ class Hrp2Bike(Application):
     def nextStep(self,step=None):
         if self.step==0:
             self.bikeSitting
-        elif self.step==1:
-
+            self.stage+=1
         else:
             self.goHalfSitting
-
+            self.stage+=1
 
     def __call__(self,i):
         self.nextStep()
