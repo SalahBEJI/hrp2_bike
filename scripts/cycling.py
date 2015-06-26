@@ -7,6 +7,8 @@ from numpy import *
 from dynamic_graph.sot.application.velocity.precomputed_tasks import Application
 from dynamic_graph.sot.tools import Oscillator, Seqplay
 
+toList = lambda sot: map(lambda x: x[2:],sot.display().split('\n')[3:-2])
+
 class Hrp2Bike(Application):
 
     def __init__(self,robot):
@@ -126,20 +128,27 @@ class Hrp2Bike(Application):
 
 
     # --- SEQUENCER ---
+class Sequencer:
     step=0
+    def __init__(self,hrp2Bike):
+        self.hrp2Bike = hrp2Bike
+
     def nextStep(self,step=None):
         if self.step==0:
-            self.bikeSitting
-            self.stage+=1
+            self.hrp2Bike.goHalfSitting
+            self.step+=1
+            print self.step
+        if self.step==1:
+            self.hrp2Bike.bikeSitting
+            self.step+=1
+            print self.step
         else:
-            self.goHalfSitting
-            self.stage+=1
+            self.hrp2Bike.goHalfSitting
+            self.step+=1
+            print self.step
 
-    def __call__(self,i):
+    def __call__(self):
         self.nextStep()
-
-
-
-
-
-
+    def __repr__(self): 
+        self.nextStep()
+        return str()
