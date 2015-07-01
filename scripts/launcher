@@ -8,7 +8,6 @@ from dynamic_graph_bridge_msgs.srv import *
 #from openhrp_bridge_msgs.srv import *
 from std_srvs.srv import *
 from geometry_msgs.msg import TransformStamped
-
 import time
 import subprocess
 import sys

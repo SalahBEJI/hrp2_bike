@@ -15,15 +15,23 @@ roscore
 ''' % locals(), '-t', '''roscore'''])
 
 
-# Launch geometric simu
+# Launch RVIZ, geometric simu
 terminal.extend(['--tab-with-profile=HoldOnExit', '-e','''
 bash -c '
 echo "RVIZ, geometric_simu"
 sleep 10
 roslaunch hrp2_bike hrp2_bike.launch
 '
-''' % locals(), '-t', '''Launch geometric simu'''])
+''' % locals(), '-t', '''Launch RVIZ, geometric simu'''])
 
+# Start dynamic_graph_bridge run_command terminal
+terminal.extend(['--tab-with-profile=HoldOnExit', '-e','''
+bash -c '
+echo "run command :"
+sleep 20
+rosrun dynamic_graph_bridge run_command
+'
+''' % locals(), '-t', '''Run Command'''])
 
 # Set the size of the terminal
 terminal.extend(['''--geometry=195x50+0+0'''])

@@ -1,5 +1,8 @@
+from dynamic_graph.sot.core import *
+from dynamic_graph.sot.core.meta_task_6d import MetaTask6d,toFlags
+from dynamic_graph.sot.core.meta_tasks_kine import *
 from dynamic_graph.sot.core.meta_tasks import generic6dReference, Task, GainAdaptive
-from dynamic_graph.sot.core.matrix_util import matrixToTuple
+from dynamic_graph.sot.core.matrix_util import matrixToTuple, vectorToTuple,rotate,matrixToRPY
 from dynamic_graph.sot.core.meta_tasks import *
 from dynamic_graph.sot.core.meta_task_posture import MetaTaskPosture, MetaTaskKinePosture
 from dynamic_graph import plug
@@ -10,6 +13,8 @@ from dynamic_graph.sot.tools import Oscillator, Seqplay
 toList = lambda sot: map(lambda x: x[2:],sot.display().split('\n')[3:-2])
 
 class Hrp2Bike(Application):
+
+    tracesRealTime = True
 
     bikeSitting = (
         # Free flyer
@@ -23,18 +28,21 @@ class Hrp2Bike(Application):
         0., 0., 0., 0.,
 
         # Arms
-        0.261799, -0.17453, 0., -0.523599, 0., 0., 0.1,
-        0.261799, 0.17453,  0., -0.523599, 0., 0., 0.1,
+         0.10, -0.25, 0.85, 0., -pi/2 , 0., 0.1,
+         0.10,  0.25, 0.85, 0., -pi/2 , 0., 0.1,
+#        0.261799, -0.17453, 0., -0.523599, 0., 0., 0.1,
+#        0.261799, 0.17453,  0., -0.523599, 0., 0., 0.1,
         )
 
     def __init__(self,robot):
         Application.__init__(self,robot)
 
         self.sot=self.solver.sot
-        self.robot=robot
+#        self.robot=robot
         self.createTasks(robot)
         self.initTasks()
         self.initTaskGains()
+        self.initSolver()
         self.initialStack()
 
     def printSolver(self): #show tasks in solver controling the robot
@@ -122,8 +130,10 @@ class Hrp2Bike(Application):
         self.taskHalfSitting.gain.setByPoint(2,0.2,0.01,0.8)
 
     #----------SOLVER------------------------------
+    def initSolver(self):
+        plug(self.sot.control,self.robot.device.control)
 
-    def push(self,task,feature=None): #push task in solver 
+    def push(self,task): #push task in solver 
         if isinstance(task,str): taskName=task
         elif "task" in task.__dict__:  taskName=task.task.name
         else: taskName=task.name
@@ -145,6 +155,21 @@ class Hrp2Bike(Application):
     def showTasks(self) : #show library of precomputed tasks
         self.tasks
 
+    # --- TRACES -----------------------------------------------------------
+    def withTraces(self):
+        if self.tracesRealTime:
+            self.robot.initializeTracer()
+        else:
+            self.robot.tracer = Tracer('trace')
+            self.robot.device.after.addSignal('{0}.triger'.format(self.robot.tracer.name))
+        self.robot.tracer.open('/tmp/','','.dat')
+        self.robot.startTracer()
+
+    def stopTraces(self):
+        self.robot.stopTracer()
+
+    def trace(self):
+        self.robot.tracer.dump()
 
     #----------RUN---------------------------------
 
@@ -158,7 +183,7 @@ class Hrp2Bike(Application):
         self.sot.clear()
         self.push(self.taskBalance)
         self.push(self.taskPosture)
-        self.push(self.taskHalfSitting)
+        self.solver.push(self.taskHalfSitting)
 
 
     def goBikeSitting(self):
@@ -173,23 +198,29 @@ class Sequencer:
     def __init__(self,hrp2Bike):
         self.hrp2Bike = hrp2Bike
 
-    def nextStep(self,step=None):
-        if self.step==0:
+    def next(self,stepSeq=None):
+        if stepSeq!=None:
+            self.step=stepSeq
+        elif self.step==0:
             self.hrp2Bike.goHalfSitting
-            self.step+=1
-            print self.step
-        if self.step==1:
-
+            print('Half Sitting')
+        elif self.step==1:
+            self.hrp2Bike.openGripper
+            print('Open Gripper')
+        elif self.step==2:
             self.hrp2Bike.goBikeSitting
-            self.step+=1
-            print self.step
+            print('Initial Position')
+        elif self.step==3:
+            self.hrp2Bike.closeGripper
+            print('Close Gripper')
         else:
             self.hrp2Bike.goHalfSitting
-            self.step+=1
-            print self.step
+            print('Half Sitting')
+        self.step+=1
+        print self.step
 
     def __call__(self):
-        self.nextStep()
+        self.next()
     def __repr__(self): 
-        self.nextStep()
+        self.next()
         return str()

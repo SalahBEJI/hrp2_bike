@@ -4,6 +4,8 @@ from dynamic_graph.script_shortcuts import optionalparentheses
 hrp2Bike = Hrp2Bike(robot)
 sequencer = Sequencer(hrp2Bike)
 
+hrp2Bike.withTraces()
+
 # --- SHORTCUTS
 
 push              = hrp2Bike.push
@@ -12,9 +14,11 @@ taskBikeSitting   = hrp2Bike.taskBikeSitting
 taskHalfSitting   = hrp2Bike.taskHalfSitting
 removeTasks       = hrp2Bike.removeTasks
 
-gopen        = optionalparentheses(appli.openGripper)
-gclose       = optionalparentheses(appli.closeGripper)
-gohs         = optionalparentheses(appli.goHalfSitting)
-gobs         = optionalparentheses(appli.goBikeSitting)
+tr           = hrp2Bike.robot.tracer
+gopen        = optionalparentheses(hrp2Bike.openGripper)
+gclose       = optionalparentheses(hrp2Bike.closeGripper)
+gohs         = optionalparentheses(hrp2Bike.goHalfSitting)
+gobs         = optionalparentheses(hrp2Bike.goBikeSitting)
 
 s = sequencer
+t = optionalparentheses(hrp2Bike.trace)
