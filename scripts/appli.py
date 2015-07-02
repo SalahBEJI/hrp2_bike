@@ -1,8 +1,8 @@
-from dynamic_graph.sot.application.cycling import Hrp2Bike, Sequencer
+from dynamic_graph.sot.application.cycling import Hrp2Bike
 from dynamic_graph.script_shortcuts import optionalparentheses
 
 hrp2Bike = Hrp2Bike(robot)
-sequencer = Sequencer(hrp2Bike)
+sequencer = hrp2Bike.sequencer
 
 hrp2Bike.withTraces()
 

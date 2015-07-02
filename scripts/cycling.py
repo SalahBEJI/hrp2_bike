@@ -193,34 +193,27 @@ class Hrp2Bike(Application):
 
 
     # --- SEQUENCER ---
-class Sequencer:
     step=0
-    def __init__(self,hrp2Bike):
-        self.hrp2Bike = hrp2Bike
-
-    def next(self,stepSeq=None):
+    def sequencer(self,stepSeq=None):
         if stepSeq!=None:
             self.step=stepSeq
-        elif self.step==0:
-            self.hrp2Bike.goHalfSitting()
+        if self.step==0:
+            self.goHalfSitting()
             print('Half Sitting')
         elif self.step==1:
-            self.hrp2Bike.openGripper()
+            self.openGripper()
             print('Open Gripper')
         elif self.step==2:
-            self.hrp2Bike.goBikeSitting()
+            self.goBikeSitting()
             print('Initial Position')
         elif self.step==3:
-            self.hrp2Bike.closeGripper()
+            self.closeGripper()
             print('Close Gripper')
         else:
-            self.hrp2Bike.goHalfSitting()
+            self.goHalfSitting()
             print('Half Sitting')
         self.step+=1
         print self.step
 
-    def __call__(self):
-        self.next()
-    def __repr__(self): 
-        self.next()
-        return str()
+    def __call__(self,i):
+        self.sequencer()
