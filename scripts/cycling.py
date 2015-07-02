@@ -183,7 +183,7 @@ class Hrp2Bike(Application):
         self.sot.clear()
         self.push(self.taskBalance)
         self.push(self.taskPosture)
-        self.solver.push(self.taskHalfSitting)
+        self.push(self.taskHalfSitting)
 
 
     def goBikeSitting(self):
