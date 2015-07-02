@@ -202,19 +202,19 @@ class Sequencer:
         if stepSeq!=None:
             self.step=stepSeq
         elif self.step==0:
-            self.hrp2Bike.goHalfSitting
+            self.hrp2Bike.goHalfSitting()
             print('Half Sitting')
         elif self.step==1:
-            self.hrp2Bike.openGripper
+            self.hrp2Bike.openGripper()
             print('Open Gripper')
         elif self.step==2:
-            self.hrp2Bike.goBikeSitting
+            self.hrp2Bike.goBikeSitting()
             print('Initial Position')
         elif self.step==3:
-            self.hrp2Bike.closeGripper
+            self.hrp2Bike.closeGripper()
             print('Close Gripper')
         else:
-            self.hrp2Bike.goHalfSitting
+            self.hrp2Bike.goHalfSitting()
             print('Half Sitting')
         self.step+=1
         print self.step
