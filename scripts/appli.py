@@ -1,8 +1,7 @@
-from dynamic_graph.sot.application.cycling import Hrp2Bike, Sequencer
+from dynamic_graph.sot.application.cycling import Hrp2Bike
 from dynamic_graph.script_shortcuts import optionalparentheses
 
 hrp2Bike = Hrp2Bike(robot)
-sequencer = Sequencer(hrp2Bike)
 
 hrp2Bike.withTraces()
 
@@ -20,5 +19,5 @@ gclose       = optionalparentheses(hrp2Bike.closeGripper)
 gohs         = optionalparentheses(hrp2Bike.goHalfSitting)
 gobs         = optionalparentheses(hrp2Bike.goBikeSitting)
 
-s = sequencer
+s = optionalparentheses(hrp2Bike.sequencer)
 t = optionalparentheses(hrp2Bike.trace)
