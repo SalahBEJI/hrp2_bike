@@ -12,6 +12,10 @@ from dynamic_graph.sot.tools import Oscillator, Seqplay
 
 toList = lambda sot: map(lambda x: x[2:],sot.display().split('\n')[3:-2])
 
+def degToRad(deg):
+    rad=(deg*pi)/180
+    return rad
+
 class Hrp2Bike(Application):
 
     tracesRealTime = True
@@ -121,9 +125,9 @@ class Hrp2Bike(Application):
                                     larm =(self.bikeSitting[29:35]))
 
     def initTaskGripper(self):
-        self.gripperOpen = 0.6
-        self.gripperClose = 0.05
-        self.closeGripper()
+        self.gripperOpen = degToRad(30)
+        self.gripperClose = degToRad(3)
+        self.openGripper()
 
     #------------------INIT-GAIN------------------
     def initTaskGains(self):
@@ -174,10 +178,10 @@ class Hrp2Bike(Application):
     #----------RUN---------------------------------
 
     def initialStack(self):
-        self.sot.clear()
         self.push(self.taskBalance)
         self.push(self.taskTrunk)
         self.push(self.taskPosture)
+        self.push(self.taskGripper)
 
     def goHalfSitting(self):
         self.sot.clear()
@@ -188,32 +192,33 @@ class Hrp2Bike(Application):
 
     def goBikeSitting(self):
         self.sot.clear()
-        self.push(self.taskTrunk)
+        self.push(self.taskBalance)
+        self.push(self.taskPosture)
         self.push(self.taskBikeSitting)
 
 
     # --- SEQUENCER ---
     step=0
     def sequencer(self,stepSeq=None):
+        print "Step : ", self.step
         if stepSeq!=None:
             self.step=stepSeq
         if self.step==0:
-            self.goHalfSitting()
-            print('Half Sitting')
+            self.initialStack()
+            print('Initial Stack')
         elif self.step==1:
-            self.openGripper()
-            print('Open Gripper')
+            self.goHalfSitting()
+            print('Half-Sitting')
         elif self.step==2:
             self.goBikeSitting()
-            print('Initial Position')
+            print('Bike Sitting')
         elif self.step==3:
             self.closeGripper()
             print('Close Gripper')
         else:
             self.goHalfSitting()
-            print('Half Sitting')
+            print('Half-Sitting')
         self.step+=1
-        print self.step
 
     def __call__(self,i):
         self.sequencer()
