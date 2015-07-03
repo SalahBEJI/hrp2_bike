@@ -19,5 +19,5 @@ gclose       = optionalparentheses(hrp2Bike.closeGripper)
 gohs         = optionalparentheses(hrp2Bike.goHalfSitting)
 gobs         = optionalparentheses(hrp2Bike.goBikeSitting)
 
-s = optionalparentheses(hrp2Bike.sequencer)
+s = hrp2Bike.sequencer
 t = optionalparentheses(hrp2Bike.trace)
