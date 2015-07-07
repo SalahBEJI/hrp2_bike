@@ -100,10 +100,8 @@ class Hrp2Bike(Application):
         # --- BALANCE ---
         self.features['chest'].frame('desired')
         self.features['waist'].frame('desired')
-        self.features['gaze'].frame('desired')
         self.features['chest'].selec.value = '111000'
         self.features['waist'].selec.value = '111000'
-        self.features['gaze'].selec.value = '111000'
         self.featureCom.selec.value = '111'
 
     def initTaskHalfSitting(self):
@@ -187,6 +185,7 @@ class Hrp2Bike(Application):
         self.sot.clear()
         self.push(self.taskBalance)
         self.push(self.taskPosture)
+        self.push(self.taskGripper)
         self.push(self.taskHalfSitting)
 
 
@@ -194,31 +193,37 @@ class Hrp2Bike(Application):
         self.sot.clear()
         self.push(self.taskBalance)
         self.push(self.taskPosture)
+        self.push(self.taskGripper)
         self.push(self.taskBikeSitting)
 
 
     # --- SEQUENCER ---
     step=0
     def sequencer(self,stepSeq=None):
-        print "Step : ", self.step
         if stepSeq!=None:
             self.step=stepSeq
         if self.step==0:
+            print "Step : ", self.step
             self.initialStack()
             print('Initial Stack')
+            self.step+=1
         elif self.step==1:
-            self.goHalfSitting()
-            print('Half-Sitting')
-        elif self.step==2:
+            print "Step : ", self.step
             self.goBikeSitting()
             print('Bike Sitting')
-        elif self.step==3:
+            self.step+=1
+        elif self.step==2:
+            print "Step : ", self.step
             self.closeGripper()
             print('Close Gripper')
+            self.step+=1
         else:
+            print "Step : ", self.step
             self.goHalfSitting()
             print('Half-Sitting')
-        self.step+=1
-
-    def __call__(self,i):
+            self.step+=1
+    def __call__(self):
         self.sequencer()
+    def __repr__(self): 
+        self.sequencer()
+        return str()

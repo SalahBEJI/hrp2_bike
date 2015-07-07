@@ -28,7 +28,7 @@ roslaunch hrp2_bike hrp2_bike.launch
 terminal.extend(['--tab-with-profile=HoldOnExit', '-e','''
 bash -c '
 echo "run command :"
-sleep 20
+sleep 25
 rosrun dynamic_graph_bridge run_command
 '
 ''' % locals(), '-t', '''Run Command'''])
