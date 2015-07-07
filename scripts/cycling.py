@@ -217,6 +217,12 @@ class Hrp2Bike(Application):
             self.closeGripper()
             print('Close Gripper')
             self.step+=1
+        #-----end of move-----
+        elif self.step==3:
+            print "Step : ", self.step
+            self.openGripper()
+            print('Open Gripper')
+            self.step+=1
         else:
             print "Step : ", self.step
             self.goHalfSitting()
