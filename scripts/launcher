@@ -89,8 +89,8 @@ try:
         raw_input("Catch an error while starting the dg. Check if you want to continue.")
     rospy.loginfo("...done")
 
-    while True:
-        launchScript(transitionCode,'next stage')
+#    while True:
+#        launchScript(transitionCode,'next stage')
 
 except rospy.ServiceException, e:
     rospy.logerr("Service call failed: %s" % e)
