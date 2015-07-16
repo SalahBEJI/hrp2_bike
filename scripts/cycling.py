@@ -45,14 +45,10 @@ class Hrp2Bike(Application):
         self.sot=self.solver.sot
 #        self.robot=robot
         self.seq=Seqplay('seqplay')
-#        self.forceSeqplay=forceSeqplay
-#        if self.forceSeqplay:
-#            self.zmpRef=ZmpFromForces('zmpRef')
-#        else:
-#            self.zmpRef=self.seq
         self.createTasks(robot)
         self.initTasks()
         self.initTaskGains()
+        self.initOscillator()
         self.initSolver()
         self.initialStack()
 
@@ -102,7 +98,7 @@ class Hrp2Bike(Application):
         self.initTaskGripper()
         self.initTaskHalfSitting()
         self.initTaskBikeSitting()
-#        self.initSeqplay()
+
 
     def initTaskBalance(self):
         # --- BALANCE ---
@@ -135,14 +131,33 @@ class Hrp2Bike(Application):
         self.gripperClose = degToRad(3)
         self.openGripper()
 
-#    def initSeqplay(self):
-#        if self.forceSeqplay:
-#            plug(self.seq.forceLeftFoot, self.zmpRef.force_0)
-#            plug(self.seq.forceRightFoot, self.zmpRef.force_1)
-#            plug (self.robot.frames['leftFootForceSensor'].position , self.zmpRef.sensorPosition_0)
-#            plug (self.robot.frames['rightFootForceSensor'].position, self.zmpRef.sensorPosition_1)
+    def setOsciFreq(self,f):
+        self.oscillatorRoll.omega.value=f*pi
+        self.oscillatorPitch.omega.value=f*pi
 
-#        plug (self.zmpRef.zmp , self.robot.device.zmp)
+    def setOsciMagni(self,m):
+        self.oscillatorRoll.magnitude.value=m*pi
+        self.oscillatorPitch.magnitude.value=m*pi
+
+    def initOscillator(self):
+        self.oscillatorRoll=Oscillator('oscillatorRoll')
+        self.oscillatorRoll.setContinuous(True)
+        self.oscillatorRoll.setActivated(True)
+        self.oscillatorRoll.setTimePeriod(self.robot.timeStep)
+        self.oscillatorRoll.setActivated(False)
+        self.oscillatorRoll.magnitude.value = 0.1
+        self.oscillatorRoll.phase.value = 0.0
+        self.oscillatorRoll.omega.value = 0.75
+
+        self.oscillatorPitch = Oscillator('oscillatorPitch')
+        self.oscillatorPitch.setContinuous(True)
+        self.oscillatorPitch.setActivated(True)
+        self.oscillatorPitch.setTimePeriod(self.robot.timeStep)
+        self.oscillatorPitch.setActivated(False)
+        self.oscillatorPitch.magnitude.value = 0.1
+        self.oscillatorPitch.phase.value = 1.57
+        self.oscillatorPitch.omega.value = 0.75
+
 
     #------------------INIT-GAIN------------------
     def initTaskGains(self):
