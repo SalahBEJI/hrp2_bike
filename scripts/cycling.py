@@ -47,7 +47,7 @@ class Hrp2Bike(Application):
         0.261799, 0.17453,  0., -0.523599, 0., 0., 0.1,
         )
 
-    def __init__(self,robot,hands=False):#, forceSeqplay=True):
+    def __init__(self,robot,hands=True):#, forceSeqplay=True):
         Application.__init__(self,robot)
 
         self.sot=self.solver.sot
@@ -276,7 +276,8 @@ class Hrp2Bike(Application):
     def goBikeSitting(self):
         self.sot.clear()
         self.push(self.taskBalance)
-        self.push(self.taskPosture)
+        self.push(self.tasks['chest'])
+#        self.push(self.taskPosture)
         if self.hands:
             self.push(self.taskGripper)
         change6dPositionReference(self.taskRH,self.features['right-wrist'],\
