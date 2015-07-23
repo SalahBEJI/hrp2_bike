@@ -17,6 +17,16 @@ def degToRad(deg):
     rad=(deg*pi)/180
     return rad
 
+def change6dPositionReference(task,feature,gain,position,selec=None,ingain=None,resetJacobian=True):
+    M=generic6dReference(position)
+    if selec!=None:
+        if isinstance(selec,str):  feature.selec.value = selec
+        else: feature.selec.value = toFlags(selec)
+    feature.reference.value = matrixToTuple(M)
+    if gain!=None:  setGain(gain,ingain)
+    if 'resetJacobianDerivative' in task.__class__.__dict__.keys() and resetJacobian:
+        task.resetJacobianDerivative()
+
 class Hrp2Bike(Application):
 
     tracesRealTime = True
@@ -33,18 +43,17 @@ class Hrp2Bike(Application):
         0., 0., 0., 0.,
 
         # Arms
-#        0.10, -0.25, 0.85, 0., -pi/2 , 0., 0.1,
-#        0.10,  0.25, 0.85, 0., -pi/2 , 0., 0.1,
         0.261799, -0.17453, 0., -0.523599, 0., 0., 0.1,
         0.261799, 0.17453,  0., -0.523599, 0., 0., 0.1,
         )
 
-    def __init__(self,robot):#, forceSeqplay=True):
+    def __init__(self,robot,hands=False):#, forceSeqplay=True):
         Application.__init__(self,robot)
 
         self.sot=self.solver.sot
+        self.hands=hands
 #        self.robot=robot
-        self.seq=Seqplay('seqplay')
+#        self.seq=Seqplay('seqplay')
         self.createTasks(robot)
         self.initTasks()
         self.initTaskGains()
@@ -95,9 +104,10 @@ class Hrp2Bike(Application):
     #------------------INIT-TASK------------------
     def initTasks(self):
         self.initTaskBalance()
-        self.initTaskGripper()
+        if self.hands:
+            self.initTaskGripper()
         self.initTaskHalfSitting()
-        self.initTaskBikeSitting()
+        #self.initTaskBikeSitting()
 
 
     def initTaskBalance(self):
@@ -158,6 +168,45 @@ class Hrp2Bike(Application):
         self.oscillatorPitch.phase.value = 1.57
         self.oscillatorPitch.omega.value = 0.75
 
+        self.stackRP = Stack_of_vector('StackOscRollPitch')
+        plug ( self.oscillatorRoll.vectorSout, self.stackRP.sin1 )  
+        plug ( self.oscillatorPitch.vectorSout, self.stackRP.sin2 )
+        self.stackRP.selec1(0,1)
+        self.stackRP.selec2(0,1)
+                
+        self.stackRPY = Stack_of_vector('StackOscRollPitchYaw')
+        plug ( self.stackRP.sout, self.stackRPY.sin1 )  
+        self.stackRPY.sin2.value = (0.0,)
+        self.stackRPY.selec1(0,2)
+        self.stackRPY.selec2(0,1)
+        
+        self.stackPoseRPY = Stack_of_vector('StackOscPoseRollPitchYaw')
+        self.stackPoseRPY.sin1.value = (0.0,0.0,0.0)
+        plug ( self.stackRPY.sout, self.stackPoseRPY.sin2 )
+        self.stackPoseRPY.selec1(0,3)
+        self.stackPoseRPY.selec2(0,3)
+        
+        self.poseRPYaw2Homo = PoseRollPitchYawToMatrixHomo('OscPoseRPYaw2Homo')
+        plug ( self.stackPoseRPY.sout , self.poseRPYaw2Homo.sin)
+
+        self.headRef = Multiply_of_matrixHomo('headRef')
+        self.headRef.sin1.value = self.robot.dynamic.signal('gaze').value
+        plug( self.poseRPYaw2Homo.sout, self.headRef.sin2)
+        plug( self.headRef.sout, self.features['gaze'].reference)
+    
+        self.chestRef = Multiply_of_matrixHomo('chestRef')
+        self.chestRef.sin1.value = self.robot.dynamic.signal('chest').value
+        plug( self.poseRPYaw2Homo.sout, self.chestRef.sin2)
+        plug( self.chestRef.sout, self.features['chest'].reference)
+
+        self.waistRef = Multiply_of_matrixHomo('waistRef')
+        self.waistRef.sin1.value = self.robot.dynamic.signal('waist').value
+        plug( self.poseRPYaw2Homo.sout, self.waistRef.sin2)
+        plug( self.waistRef.sout, self.features['waist'].reference)
+
+        self.setOsciFreq(1)
+        self.setOsciMagni(1)
+
 
     #------------------INIT-GAIN------------------
     def initTaskGains(self):
@@ -212,13 +261,15 @@ class Hrp2Bike(Application):
         self.push(self.taskBalance)
         self.push(self.taskTrunk)
         self.push(self.taskPosture)
-        self.push(self.taskGripper)
+        if self.hands:
+            self.push(self.taskGripper)
 
     def goHalfSitting(self):
         self.sot.clear()
         self.push(self.taskBalance)
         self.push(self.taskPosture)
-        self.push(self.taskGripper)
+        if self.hands:
+            self.push(self.taskGripper)
         self.push(self.taskHalfSitting)
 
 
@@ -226,34 +277,32 @@ class Hrp2Bike(Application):
         self.sot.clear()
         self.push(self.taskBalance)
         self.push(self.taskPosture)
-        self.push(self.taskGripper)
-        self.push(self.taskBikeSitting)
+        if self.hands:
+            self.push(self.taskGripper)
+        change6dPositionReference(self.taskRH,self.features['right-wrist'],\
+                                    self.gains['right-wrist'],\
+                                    (0.3,-0.3,1.1,-pi/2,0,pi/2),'111111')
+        self.push(self.taskRH)
+        change6dPositionReference(self.taskLH,self.features['left-wrist'],\
+                                    self.gains['left-wrist'],\
+                                     (0.3,0.3,1.1,pi/2,0,-pi/2),'111111')
+        self.push(self.taskLH)
+        change6dPositionReference(self.taskRF,self.features['right-ankle'],\
+                                    self.gains['right-ankle'],\
+                                    (0.015,-0.25,0.2,0,0,0),'111111')
+        self.push(self.taskRF)
+        change6dPositionReference(self.taskLF,self.features['left-ankle'],\
+                                    self.gains['left-ankle'],\
+                                    (0.015,0.25,0.2,0,0,0),'111111')
+        self.push(self.taskLF)
 
-    def prepareSeqplay(self):
-        self.seq.leftAnkle.recompute(2)  
-        self.seq.rightAnkle.recompute(2) 
-        self.seq.com.recompute(2) 
-        self.seq.comdot.recompute(2) 
-        self.seq.leftAnkleVel.recompute(2) 
-        self.seq.rightAnkleVel.recompute(2)
-        self.seq.posture.recompute(2)
+    def startOcillation(self):
+        self.oscillatorRoll.setActivated(True)
+        self.oscillatorPitch.setActivated(True)
 
-        
-        plug (self.seq.leftAnkle, self.leftAnkle.reference)
-        plug (self.seq.rightAnkle, self.rightAnkle.reference)
-
-        plug (self.seq.com, self.comRef)
-        plug (self.seq.com, self.featureComDes.errorIN)
-
-        plug (self.seq.comdot, self.comdot)
-        plug (self.seq.comdot, self.featureComDes.errordotIN)
-
-        plug (self.seq.leftAnkleVel, self.leftAnkle.velocity)
-        plug (self.seq.rightAnkleVel, self.rightAnkle.velocity)
-        plug (self.seq.posture, self.featurePostureDes.errorIN)
-
-    def runSeqplay(self):
-        self.seq.start ()
+    def stopOcillation(self):
+        self.oscillatorRoll.setActivated(False)
+        self.oscillatorPitch.setActivated(False)
 
     # --- SEQUENCER ---
     step=0
@@ -273,24 +322,26 @@ class Hrp2Bike(Application):
             self.step+=1
         elif self.step==2:
             print "Step : ", self.step
-            self.closeGripper()
+            if self.hands:
+                self.closeGripper()
             print('Close Gripper')
             self.step+=1
-        #-----seqplay preparation------
+        #-----move start------
         elif self.step==3:
             print "Step : ", self.step
-            self.prepareSeqplay()
-            print ('Seqplay prepared')
-        #-----move start------
-        elif self.step==4:
-            print "Step : ", self.step
-            self.runSeqplay()
-            print('Seqplay run')
+            self.startOcillation()
+            print('Start oscillation')
             self.step+=1
         #-----end of move-----
+        elif self.step==4:
+            print "Step : ", self.step
+            self.stopOcillation()
+            print('Stop oscillation')
+            self.step+=1
         elif self.step==5:
             print "Step : ", self.step
-            self.openGripper()
+            if self.hands:
+                self.openGripper()
             print('Open Gripper')
             self.step+=1
         else:
