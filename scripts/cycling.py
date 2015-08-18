@@ -94,6 +94,7 @@ class Hrp2Bike(Application):
         self.taskTrunk       = self.tasks['trunk']
         self.taskPosture     = self.tasks['posture']
         self.taskBalance     = self.tasks['balance']
+        self.taskWaist       = self.tasks['waist']
 
     def openGripper(self):
         self.taskGripper.gotoq(None,rhand=(self.gripperOpen,),lhand=(self.gripperOpen,))
@@ -275,9 +276,12 @@ class Hrp2Bike(Application):
 
     def goBikeSitting(self):
         self.sot.clear()
-        self.push(self.taskBalance)
-        self.push(self.tasks['chest'])
-#        self.push(self.taskPosture)
+#        self.push(self.taskBalance)
+#        self.push(self.tasks['chest'])
+        change6dPositionReference(self.taskWaist,self.features['waist'],\
+                                    self.gains['waist'],\
+                                    (-0.4,0.0,0.75,0,0,0),'111111')
+        self.push(self.taskWaist)
         if self.hands:
             self.push(self.taskGripper)
         change6dPositionReference(self.taskRH,self.features['right-wrist'],\
@@ -300,7 +304,7 @@ class Hrp2Bike(Application):
                                     #(0.015,0.25,0.2,0,0,0),'111111')
                                     (0.0,0.1125,0.44,0,0,0),'111111')
         self.push(self.taskLF)
-
+        self.push(self.taskPosture)
     def startOcillation(self):
         self.oscillatorRoll.setActivated(True)
         self.oscillatorPitch.setActivated(True)
