@@ -280,29 +280,29 @@ class Hrp2Bike(Application):
 #        self.push(self.tasks['chest'])
         change6dPositionReference(self.taskWaist,self.features['waist'],\
                                     self.gains['waist'],\
-                                    (-0.4,0.0,0.75,0,0,0),'111111')
+                                    (-0.444545454545,0.0,0.778,0,0,0),'111111')
         self.push(self.taskWaist)
         if self.hands:
             self.push(self.taskGripper)
         change6dPositionReference(self.taskRH,self.features['right-wrist'],\
                                     self.gains['right-wrist'],\
                                     #(0.3,-0.3,1.1,-pi/2,0,pi/2),'111111')
-                                    (0.3785,-0.1365,1.07,-pi/2,0,pi/2),'111111')
+                                    (0.3285,-0.1365,0.855,-pi/2,0,pi/2),'111111')
         self.push(self.taskRH)
         change6dPositionReference(self.taskLH,self.features['left-wrist'],\
                                     self.gains['left-wrist'],\
                                      #(0.3,0.3,1.1,pi/2,0,-pi/2),'111111')
-                                     (0.3785,0.1365,1.07,pi/2,0,-pi/2),'111111')
+                                     (0.3285,0.1365,0.855,pi/2,0,-pi/2),'111111')
         self.push(self.taskLH)
         change6dPositionReference(self.taskRF,self.features['right-ankle'],\
                                     self.gains['right-ankle'],\
                                     #(0.015,-0.25,0.2,0,0,0),'111111')
-                                    (0.0,-0.1125,0.10,0,0,0),'111111')
+                                    (0.0,-0.1125,0.12,0,0,0),'111111')
         self.push(self.taskRF)
         change6dPositionReference(self.taskLF,self.features['left-ankle'],\
                                     self.gains['left-ankle'],\
                                     #(0.015,0.25,0.2,0,0,0),'111111')
-                                    (0.0,0.1125,0.44,0,0,0),'111111')
+                                    (0.0,0.1125,0.46,0,0,0),'111111')
         self.push(self.taskLF)
         self.push(self.taskPosture)
     def startOcillation(self):
