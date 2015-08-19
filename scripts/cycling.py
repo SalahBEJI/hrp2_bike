@@ -31,20 +31,20 @@ class Hrp2Bike(Application):
 
     tracesRealTime = True
 
-    bikeSitting = (
+    initialPose = (
         # Free flyer
-        0., 0., 0.648702, 0., 0. , 0.,
+        0., 0., 0., 0., 0. , 0.,
 
         # Legs
-        0., 0., -0.453786, 0.872665, -0.418879, 0.,
-        0., 0., -0.453786, 0.872665, -0.418879, 0.,
+        0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0.,
 
         # Chest and head
         0., 0., 0., 0.,
 
         # Arms
-        0.261799, -0.17453, 0., -0.523599, 0., 0., 0.1,
-        0.261799, 0.17453,  0., -0.523599, 0., 0., 0.1,
+        0., 0., 0., 0., 0., 0., 0.1,
+        0., 0.,  0., 0., 0., 0., 0.1,
         )
 
     def __init__(self,robot,hands=True):#, forceSeqplay=True):
@@ -81,7 +81,7 @@ class Hrp2Bike(Application):
 
     def createTasks(self,robot):
         self.taskHalfSitting = MetaTaskKinePosture(self.robot.dynamic,'halfsitting')
-        self.taskBikeSitting = MetaTaskKinePosture(self.robot.dynamic,'bike-sitting')
+        self.taskInitialPose = MetaTaskKinePosture(self.robot.dynamic,'initial-pose')
         self.taskGripper     = MetaTaskKinePosture(self.robot.dynamic,'gripper')
 
         (self.tasks['trunk'],self.gains['trunk'])= self.createTrunkTask(robot, 'trunk')
@@ -108,7 +108,7 @@ class Hrp2Bike(Application):
         if self.hands:
             self.initTaskGripper()
         self.initTaskHalfSitting()
-        #self.initTaskBikeSitting()
+        self.initTaskInitialPose()
 
 
     def initTaskBalance(self):
@@ -128,14 +128,14 @@ class Hrp2Bike(Application):
                                     rarm =(self.robot.halfSitting[22:28]),  \
                                     larm =(self.robot.halfSitting[29:35]))
 
-    def initTaskBikeSitting(self):
-        self.taskBikeSitting.gotoq(None,\
-                                    rleg =(self.bikeSitting[6:12]),   \
-                                    lleg =(self.bikeSitting[12:18]),  \
-                                    chest=(self.bikeSitting[18:20]),  \
-                                    head =(self.bikeSitting[20:22]),  \
-                                    rarm =(self.bikeSitting[22:28]),  \
-                                    larm =(self.bikeSitting[29:35]))
+    def initTaskInitialPose(self):
+        self.taskInitialPose.gotoq(None,\
+                                    rleg =(self.initialPose[6:12]),   \
+                                    lleg =(self.initialPose[12:18]),  \
+                                    chest=(self.initialPose[18:20]),  \
+                                    head =(self.initialPose[20:22]),  \
+                                    rarm =(self.initialPose[22:28]),  \
+                                    larm =(self.initialPose[29:35]))
 
     def initTaskGripper(self):
         self.gripperOpen = degToRad(30)
@@ -257,6 +257,15 @@ class Hrp2Bike(Application):
         self.robot.tracer.dump()
 
     #----------RUN---------------------------------
+    def goInitialPose(self):
+        self.sot.clear()
+#        self.push(self.taskBalance)
+        self.push(self.taskLH)
+        self.push(self.taskRH)
+        self.push(self.taskPosture)
+        if self.hands:
+            self.push(self.taskGripper)
+        self.push(self.taskInitialPose)
 
     def initialStack(self):
         self.push(self.taskBalance)
@@ -321,8 +330,8 @@ class Hrp2Bike(Application):
         #-----initial position------
         if self.step==0:
             print "Step : ", self.step
-            self.initialStack()
-            print('Initial Stack')
+            self.goInitialPose()
+            print('Initial Pose')
             self.step+=1
         elif self.step==1:
             print "Step : ", self.step
