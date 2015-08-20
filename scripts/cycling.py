@@ -289,19 +289,19 @@ class Hrp2Bike(Application):
 #        self.push(self.tasks['chest'])
         change6dPositionReference(self.taskWaist,self.features['waist'],\
                                     self.gains['waist'],\
-                                    (-0.444545454545,0.0,0.778,0,0,0),'111111')
+                                    (-0.25,0.0,0.65,0,0,0),'111111')
         self.push(self.taskWaist)
         if self.hands:
             self.push(self.taskGripper)
         change6dPositionReference(self.taskRH,self.features['right-wrist'],\
                                     self.gains['right-wrist'],\
                                     #(0.3,-0.3,1.1,-pi/2,0,pi/2),'111111')
-                                    (0.3285,-0.1365,0.855,-pi/2,0,pi/2),'111111')
+                                    (0.20,-0.255,1.0,-pi/2,0,pi/2),'111111')
         self.push(self.taskRH)
         change6dPositionReference(self.taskLH,self.features['left-wrist'],\
                                     self.gains['left-wrist'],\
                                      #(0.3,0.3,1.1,pi/2,0,-pi/2),'111111')
-                                     (0.3285,0.1365,0.855,pi/2,0,-pi/2),'111111')
+                                     (0.20,0.255,1.0,pi/2,0,-pi/2),'111111')
         self.push(self.taskLH)
         change6dPositionReference(self.taskRF,self.features['right-ankle'],\
                                     self.gains['right-ankle'],\
@@ -323,7 +323,7 @@ class Hrp2Bike(Application):
         self.oscillatorPitch.setActivated(False)
 
     # --- SEQUENCER ---
-    step=0
+    step=1
     def sequencer(self,stepSeq=None):
         if stepSeq!=None:
             self.step=stepSeq
