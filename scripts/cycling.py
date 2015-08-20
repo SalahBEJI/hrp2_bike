@@ -260,8 +260,8 @@ class Hrp2Bike(Application):
     def goInitialPose(self):
         self.sot.clear()
 #        self.push(self.taskBalance)
-        self.push(self.taskLH)
-        self.push(self.taskRH)
+        self.push(self.taskLF)
+        self.push(self.taskRF)
         self.push(self.taskPosture)
         if self.hands:
             self.push(self.taskGripper)
