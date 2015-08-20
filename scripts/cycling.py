@@ -105,6 +105,7 @@ class Hrp2Bike(Application):
     #------------------INIT-TASK------------------
     def initTasks(self):
         self.initTaskBalance()
+        self.initTaskPosture()
         if self.hands:
             self.initTaskGripper()
         self.initTaskHalfSitting()
@@ -314,7 +315,7 @@ class Hrp2Bike(Application):
 #        self.push(self.tasks['chest'])
         change6dPositionReference(self.taskWaist,self.features['waist'],\
                                     self.gains['waist'],\
-                                    (-0.25,0.0,0.65,0,0,0),'111111')
+                                    (-0.28,0.0,0.62,0,0,0),'111111')
         self.push(self.taskWaist)
         if self.hands:
             self.push(self.taskGripper)
