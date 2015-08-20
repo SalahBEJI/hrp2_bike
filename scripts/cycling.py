@@ -137,6 +137,31 @@ class Hrp2Bike(Application):
                                     rarm =(self.initialPose[22:28]),  \
                                     larm =(self.initialPose[29:35]))
 
+    def initTaskPosture(self):
+        # --- LEAST NORM
+        weight_ff        = 0
+        weight_leg       = 3
+        weight_knee      = 5
+        weight_chest     = 1
+        weight_chesttilt = 10
+        weight_head      = 0.3
+        weight_arm       = 1
+
+        weight = diag( (weight_ff,)*6 + (weight_leg,)*12 + (weight_chest,)*2 + (weight_head,)*2 + (weight_arm,)*14)
+        weight[9,9] = weight_knee
+        weight[15,15] = weight_knee
+        weight[19,19] = weight_chesttilt
+        #weight = weight[6:,:]
+
+        self.featurePosture.jacobianIN.value = matrixToTuple(weight)
+        self.featurePostureDes.errorIN.value = self.robot.halfSitting
+        mask = '1'*36
+        # mask = 6*'0'+12*'0'+4*'1'+14*'0'
+        # mask = '000000000000111100000000000000000000000000'
+        # robot.dynamic.displaySignals ()
+        # robot.dynamic.Jchest.value
+        self.features['posture'].selec.value = mask
+
     def initTaskGripper(self):
         self.gripperOpen = degToRad(30)
         self.gripperClose = degToRad(3)
