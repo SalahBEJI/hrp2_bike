@@ -315,7 +315,7 @@ class Hrp2Bike(Application):
 #        self.push(self.tasks['chest'])
         change6dPositionReference(self.taskWaist,self.features['waist'],\
                                     self.gains['waist'],\
-                                    (-0.28,0.0,0.62,0,0,0),'111111')
+                                    (-0.28,0.0,0.63,0,0,0),'111111')
         self.push(self.taskWaist)
         if self.hands:
             self.push(self.taskGripper)
@@ -332,12 +332,12 @@ class Hrp2Bike(Application):
         change6dPositionReference(self.taskRF,self.features['right-ankle'],\
                                     self.gains['right-ankle'],\
                                     #(0.015,-0.25,0.2,0,0,0),'111111')
-                                    (0.0,-0.1125,0.12,0,0,0),'111111')
+                                    (0.0,-0.1125,0.12,0,0,degToRad(-8)),'111111')
         self.push(self.taskRF)
         change6dPositionReference(self.taskLF,self.features['left-ankle'],\
                                     self.gains['left-ankle'],\
                                     #(0.015,0.25,0.2,0,0,0),'111111')
-                                    (0.0,0.1125,0.46,0,0,0),'111111')
+                                    (0.0,0.1125,0.46,0,0,degToRad(8)),'111111')
         self.push(self.taskLF)
         self.push(self.taskPosture)
     def startOcillation(self):
