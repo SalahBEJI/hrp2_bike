@@ -9,7 +9,7 @@ hrp2Bike.withTraces()
 
 push              = hrp2Bike.push
 sot               = hrp2Bike.sot
-taskBikeSitting   = hrp2Bike.taskBikeSitting
+taskInitialPose   = hrp2Bike.taskInitialPose
 taskHalfSitting   = hrp2Bike.taskHalfSitting
 removeTasks       = hrp2Bike.removeTasks
 
@@ -18,6 +18,7 @@ gopen        = optionalparentheses(hrp2Bike.openGripper)
 gclose       = optionalparentheses(hrp2Bike.closeGripper)
 gohs         = optionalparentheses(hrp2Bike.goHalfSitting)
 gobs         = optionalparentheses(hrp2Bike.goBikeSitting)
+goip         = optionalparentheses(hrp2Bike.goInitialPose)
 
 s = hrp2Bike.sequencer
 t = optionalparentheses(hrp2Bike.trace)
