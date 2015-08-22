@@ -308,6 +308,9 @@ class Hrp2Bike(Application):
             self.push(self.taskGripper)
         self.push(self.taskHalfSitting)
 
+    #------------parameters of bike
+    xg=0.0, zg=0.29 #center of crank gear
+    R=0.17 #pedal-center of crank gear
 
     def goBikeSitting(self):
         self.sot.clear()
@@ -321,32 +324,69 @@ class Hrp2Bike(Application):
             self.push(self.taskGripper)
         change6dPositionReference(self.taskRH,self.features['right-wrist'],\
                                     self.gains['right-wrist'],\
-                                    #(0.3,-0.3,1.1,-pi/2,0,pi/2),'111111')
                                     (0.20,-0.255,1.0,-pi/2,0,pi/2),'111111')
         self.push(self.taskRH)
         change6dPositionReference(self.taskLH,self.features['left-wrist'],\
                                     self.gains['left-wrist'],\
-                                     #(0.3,0.3,1.1,pi/2,0,-pi/2),'111111')
                                      (0.20,0.255,1.0,pi/2,0,-pi/2),'111111')
         self.push(self.taskLH)
         change6dPositionReference(self.taskRF,self.features['right-ankle'],\
                                     self.gains['right-ankle'],\
-                                    #(0.015,-0.25,0.2,0,0,0),'111111')
                                     (0.0,-0.1125,0.12,0,0,degToRad(-8)),'111111')
         self.push(self.taskRF)
         change6dPositionReference(self.taskLF,self.features['left-ankle'],\
                                     self.gains['left-ankle'],\
-                                    #(0.015,0.25,0.2,0,0,0),'111111')
                                     (0.0,0.1125,0.46,0,0,degToRad(8)),'111111')
         self.push(self.taskLF)
         self.push(self.taskPosture)
+
     def startOcillation(self):
-        self.oscillatorRoll.setActivated(True)
-        self.oscillatorPitch.setActivated(True)
+        self.circle()
+#        self.oscillatorRoll.setActivated(True)
+#        self.oscillatorPitch.setActivated(True)
 
     def stopOcillation(self):
-        self.oscillatorRoll.setActivated(False)
-        self.oscillatorPitch.setActivated(False)
+        self.rotation=False
+#        self.oscillatorRoll.setActivated(False)
+#        self.oscillatorPitch.setActivated(False)
+
+    def circle(self,nbPoint=16,rotation=True): #nbPoint=number of point to dicretise the circle
+        self.rotation=rotation
+        self.stepCircle=(2*pi)/nbPoint
+        for j in range(0,nbPoint):
+            circleL[j]=(j*self.stepCircle)+(pi/2)
+            circleR[j]=-(j*self.stepCircle)+(3*pi/2)
+        self.sot.clear()
+        change6dPositionReference(self.taskWaist,self.features['waist'],\
+                                    self.gains['waist'],\
+                                    (-0.28,0.0,0.63,0,0,0),'111111')
+        self.push(self.taskWaist)
+        if self.hands:
+            self.push(self.taskGripper)
+        change6dPositionReference(self.taskRH,self.features['right-wrist'],\
+                                    self.gains['right-wrist'],\
+                                    (0.20,-0.255,1.0,-pi/2,0,pi/2),'111111')
+        self.push(self.taskRH)
+        change6dPositionReference(self.taskLH,self.features['left-wrist'],\
+                                    self.gains['left-wrist'],\
+                                     (0.20,0.255,1.0,pi/2,0,-pi/2),'111111')
+        self.push(self.taskLH)
+        #--------rotation--------
+        while self.rotation:
+            for i in range(0,nbPoint):
+                xpL=(cos(circleL[i])*R)+xg
+                zpL=(sin(circleL[i])*R)+zg
+                xpR=(cos(circleR[i])*R)+xg
+                zpR=(sin(circleR[i])*R)+zg
+                change6dPositionReference(self.taskRF,self.features['right-ankle'],\
+                                            self.gains['right-ankle'],\
+                                            (xpR,-0.1125,zpR,0,0,degToRad(-8)),'111111')
+                self.push(self.taskRF)
+                change6dPositionReference(self.taskLF,self.features['left-ankle'],\
+                                            self.gains['left-ankle'],\
+                                            (xpL,0.1125,zpL,0,0,degToRad(8)),'111111')
+                self.push(self.taskLF)
+        self.push(self.taskPosture)
 
     # --- SEQUENCER ---
     step=1
