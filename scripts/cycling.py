@@ -308,8 +308,8 @@ class Hrp2Bike(Application):
             self.push(self.taskGripper)
         self.push(self.taskHalfSitting)
 
-    #------------parameters of bike
-    xg=0.0, zg=0.29 #center of crank gear
+    #------------parameters of bike-------
+    xg=0.0; zg=0.29 #center of crank gear
     R=0.17 #pedal-center of crank gear
 
     def goBikeSitting(self):
