@@ -57,7 +57,6 @@ class Hrp2Bike(Application):
         self.createTasks(robot)
         self.initTasks()
         self.initTaskGains()
-        self.initOscillator()
         self.initSolver()
         self.initialStack()
 
@@ -168,72 +167,6 @@ class Hrp2Bike(Application):
         self.gripperClose = degToRad(3)
         self.openGripper()
 
-    def setOsciFreq(self,f):
-        self.oscillatorRoll.omega.value=f*pi
-        self.oscillatorPitch.omega.value=f*pi
-
-    def setOsciMagni(self,m):
-        self.oscillatorRoll.magnitude.value=m*pi
-        self.oscillatorPitch.magnitude.value=m*pi
-
-    def initOscillator(self):
-        self.oscillatorRoll=Oscillator('oscillatorRoll')
-        self.oscillatorRoll.setContinuous(True)
-        self.oscillatorRoll.setActivated(True)
-        self.oscillatorRoll.setTimePeriod(self.robot.timeStep)
-        self.oscillatorRoll.setActivated(False)
-        self.oscillatorRoll.magnitude.value = 0.1
-        self.oscillatorRoll.phase.value = 0.0
-        self.oscillatorRoll.omega.value = 0.75
-
-        self.oscillatorPitch = Oscillator('oscillatorPitch')
-        self.oscillatorPitch.setContinuous(True)
-        self.oscillatorPitch.setActivated(True)
-        self.oscillatorPitch.setTimePeriod(self.robot.timeStep)
-        self.oscillatorPitch.setActivated(False)
-        self.oscillatorPitch.magnitude.value = 0.1
-        self.oscillatorPitch.phase.value = 1.57
-        self.oscillatorPitch.omega.value = 0.75
-
-        self.stackRP = Stack_of_vector('StackOscRollPitch')
-        plug ( self.oscillatorRoll.vectorSout, self.stackRP.sin1 )  
-        plug ( self.oscillatorPitch.vectorSout, self.stackRP.sin2 )
-        self.stackRP.selec1(0,1)
-        self.stackRP.selec2(0,1)
-                
-        self.stackRPY = Stack_of_vector('StackOscRollPitchYaw')
-        plug ( self.stackRP.sout, self.stackRPY.sin1 )  
-        self.stackRPY.sin2.value = (0.0,)
-        self.stackRPY.selec1(0,2)
-        self.stackRPY.selec2(0,1)
-        
-        self.stackPoseRPY = Stack_of_vector('StackOscPoseRollPitchYaw')
-        self.stackPoseRPY.sin1.value = (0.0,0.0,0.0)
-        plug ( self.stackRPY.sout, self.stackPoseRPY.sin2 )
-        self.stackPoseRPY.selec1(0,3)
-        self.stackPoseRPY.selec2(0,3)
-        
-        self.poseRPYaw2Homo = PoseRollPitchYawToMatrixHomo('OscPoseRPYaw2Homo')
-        plug ( self.stackPoseRPY.sout , self.poseRPYaw2Homo.sin)
-
-        self.headRef = Multiply_of_matrixHomo('headRef')
-        self.headRef.sin1.value = self.robot.dynamic.signal('gaze').value
-        plug( self.poseRPYaw2Homo.sout, self.headRef.sin2)
-        plug( self.headRef.sout, self.features['gaze'].reference)
-    
-        self.chestRef = Multiply_of_matrixHomo('chestRef')
-        self.chestRef.sin1.value = self.robot.dynamic.signal('chest').value
-        plug( self.poseRPYaw2Homo.sout, self.chestRef.sin2)
-        plug( self.chestRef.sout, self.features['chest'].reference)
-
-        self.waistRef = Multiply_of_matrixHomo('waistRef')
-        self.waistRef.sin1.value = self.robot.dynamic.signal('waist').value
-        plug( self.poseRPYaw2Homo.sout, self.waistRef.sin2)
-        plug( self.waistRef.sout, self.features['waist'].reference)
-
-        self.setOsciFreq(1)
-        self.setOsciMagni(1)
-
 
     #------------------INIT-GAIN------------------
     def initTaskGains(self):
@@ -340,15 +273,8 @@ class Hrp2Bike(Application):
         self.push(self.taskLF)
         self.push(self.taskPosture)
 
-    def startOcillation(self):
-        self.circle()
-#        self.oscillatorRoll.setActivated(True)
-#        self.oscillatorPitch.setActivated(True)
-
-    def stopOcillation(self):
+    def stopMove(self):
         self.rotation=False
-#        self.oscillatorRoll.setActivated(False)
-#        self.oscillatorPitch.setActivated(False)
 
     def circle(self,nbPoint=16,rotation=True): #nbPoint=number of point to dicretise the circle
         self.rotation=rotation
@@ -416,13 +342,13 @@ class Hrp2Bike(Application):
         elif self.step==3:
             print "Step : ", self.step
             self.circle()
-            print('Start oscillation')
+            print('Start movement')
             self.step+=1
         #-----end of move-----
         elif self.step==4:
             print "Step : ", self.step
-            self.stopOcillation()
-            print('Stop oscillation')
+            self.stopMove()
+            print('Stop movement')
             self.step+=1
         elif self.step==5:
             print "Step : ", self.step
