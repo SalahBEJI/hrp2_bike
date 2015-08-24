@@ -353,9 +353,11 @@ class Hrp2Bike(Application):
     def circle(self,nbPoint=16,rotation=True): #nbPoint=number of point to dicretise the circle
         self.rotation=rotation
         self.stepCircle=(2*pi)/nbPoint
+        circleL=[]
+        circleR=[]
         for j in range(0,nbPoint):
-            circleL[j]=(j*self.stepCircle)+(pi/2)
-            circleR[j]=-(j*self.stepCircle)+(3*pi/2)
+            circleL.append((j*self.stepCircle)+(pi/2))
+            circleR.append(-(j*self.stepCircle)+(3*pi/2))
         self.sot.clear()
         change6dPositionReference(self.taskWaist,self.features['waist'],\
                                     self.gains['waist'],\
@@ -372,21 +374,21 @@ class Hrp2Bike(Application):
                                      (0.20,0.255,1.0,pi/2,0,-pi/2),'111111')
         self.push(self.taskLH)
         #--------rotation--------
-        while self.rotation:
-            for i in range(0,nbPoint):
-                xpL=(cos(circleL[i])*R)+xg
-                zpL=(sin(circleL[i])*R)+zg
-                xpR=(cos(circleR[i])*R)+xg
-                zpR=(sin(circleR[i])*R)+zg
-                change6dPositionReference(self.taskRF,self.features['right-ankle'],\
-                                            self.gains['right-ankle'],\
-                                            (xpR,-0.1125,zpR,0,0,degToRad(-8)),'111111')
-                self.push(self.taskRF)
-                change6dPositionReference(self.taskLF,self.features['left-ankle'],\
-                                            self.gains['left-ankle'],\
-                                            (xpL,0.1125,zpL,0,0,degToRad(8)),'111111')
-                self.push(self.taskLF)
+        self.push(self.taskRF)
+        self.push(self.taskLF)
         self.push(self.taskPosture)
+        #while self.rotation:
+        for i in range(0,nbPoint):
+            xpL=(cos(circleL[i])*self.R)+self.xg
+            zpL=(sin(circleL[i])*self.R)+self.zg
+            xpR=(cos(circleR[i])*self.R)+self.xg
+            zpR=(sin(circleR[i])*self.R)+self.zg
+            change6dPositionReference(self.taskRF,self.features['right-ankle'],\
+                                        self.gains['right-ankle'],\
+                                        (xpR,-0.1125,zpR,0,0,degToRad(-8)),'111111')
+            change6dPositionReference(self.taskLF,self.features['left-ankle'],\
+                                        self.gains['left-ankle'],\
+                                        (xpL,0.1125,zpL,0,0,degToRad(8)),'111111')
 
     # --- SEQUENCER ---
     step=1
@@ -413,7 +415,7 @@ class Hrp2Bike(Application):
         #-----move start------
         elif self.step==3:
             print "Step : ", self.step
-            self.startOcillation()
+            self.circle()
             print('Start oscillation')
             self.step+=1
         #-----end of move-----
