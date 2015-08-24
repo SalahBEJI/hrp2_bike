@@ -10,6 +10,7 @@ from numpy import *
 from dynamic_graph.sot.application.velocity.precomputed_tasks import Application
 from dynamic_graph.sot.tools import Oscillator, Seqplay
 from dynamic_graph.sot.dynamics.zmp_from_forces import ZmpFromForces
+import time
 
 toList = lambda sot: map(lambda x: x[2:],sot.display().split('\n')[3:-2])
 
@@ -303,19 +304,19 @@ class Hrp2Bike(Application):
         self.push(self.taskRF)
         self.push(self.taskLF)
         self.push(self.taskPosture)
-        while self.rotation:
-            for i in range(0,nbPoint):
-                xpL=(cos(circleL[i])*self.R)+self.xg
-                zpL=(sin(circleL[i])*self.R)+self.zg
-                xpR=(cos(circleR[i])*self.R)+self.xg
-                zpR=(sin(circleR[i])*self.R)+self.zg
-                change6dPositionReference(self.taskRF,self.features['right-ankle'],\
-                                            self.gains['right-ankle'],\
-                                            (xpR,-0.1125,zpR,0,0,degToRad(-8)),'111111')
-                change6dPositionReference(self.taskLF,self.features['left-ankle'],\
-                                            self.gains['left-ankle'],\
-                                            (xpL,0.1125,zpL,0,0,degToRad(8)),'111111')
-
+        #while self.rotation:
+        for i in range(0,nbPoint):
+            xpL=(cos(circleL[i])*self.R)+self.xg
+            zpL=(sin(circleL[i])*self.R)+self.zg
+            xpR=(cos(circleR[i])*self.R)+self.xg
+            zpR=(sin(circleR[i])*self.R)+self.zg
+            change6dPositionReference(self.taskRF,self.features['right-ankle'],\
+                                        self.gains['right-ankle'],\
+                                        (xpR,-0.1125,zpR,0,0,degToRad(-8)),'111111')
+            change6dPositionReference(self.taskLF,self.features['left-ankle'],\
+                                        self.gains['left-ankle'],\
+                                        (xpL,0.1125,zpL,0,0,degToRad(8)),'111111')
+            time.sleep(15)
     # --- SEQUENCER ---
     step=1
     def sequencer(self,stepSeq=None):
