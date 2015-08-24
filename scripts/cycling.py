@@ -10,6 +10,7 @@ from numpy import *
 from dynamic_graph.sot.application.velocity.precomputed_tasks import Application
 from dynamic_graph.sot.tools import Oscillator, Seqplay
 from dynamic_graph.sot.dynamics.zmp_from_forces import ZmpFromForces
+import time
 
 toList = lambda sot: map(lambda x: x[2:],sot.display().split('\n')[3:-2])
 
@@ -57,7 +58,6 @@ class Hrp2Bike(Application):
         self.createTasks(robot)
         self.initTasks()
         self.initTaskGains()
-        self.initOscillator()
         self.initSolver()
         self.initialStack()
 
@@ -168,72 +168,6 @@ class Hrp2Bike(Application):
         self.gripperClose = degToRad(3)
         self.openGripper()
 
-    def setOsciFreq(self,f):
-        self.oscillatorRoll.omega.value=f*pi
-        self.oscillatorPitch.omega.value=f*pi
-
-    def setOsciMagni(self,m):
-        self.oscillatorRoll.magnitude.value=m*pi
-        self.oscillatorPitch.magnitude.value=m*pi
-
-    def initOscillator(self):
-        self.oscillatorRoll=Oscillator('oscillatorRoll')
-        self.oscillatorRoll.setContinuous(True)
-        self.oscillatorRoll.setActivated(True)
-        self.oscillatorRoll.setTimePeriod(self.robot.timeStep)
-        self.oscillatorRoll.setActivated(False)
-        self.oscillatorRoll.magnitude.value = 0.1
-        self.oscillatorRoll.phase.value = 0.0
-        self.oscillatorRoll.omega.value = 0.75
-
-        self.oscillatorPitch = Oscillator('oscillatorPitch')
-        self.oscillatorPitch.setContinuous(True)
-        self.oscillatorPitch.setActivated(True)
-        self.oscillatorPitch.setTimePeriod(self.robot.timeStep)
-        self.oscillatorPitch.setActivated(False)
-        self.oscillatorPitch.magnitude.value = 0.1
-        self.oscillatorPitch.phase.value = 1.57
-        self.oscillatorPitch.omega.value = 0.75
-
-        self.stackRP = Stack_of_vector('StackOscRollPitch')
-        plug ( self.oscillatorRoll.vectorSout, self.stackRP.sin1 )  
-        plug ( self.oscillatorPitch.vectorSout, self.stackRP.sin2 )
-        self.stackRP.selec1(0,1)
-        self.stackRP.selec2(0,1)
-                
-        self.stackRPY = Stack_of_vector('StackOscRollPitchYaw')
-        plug ( self.stackRP.sout, self.stackRPY.sin1 )  
-        self.stackRPY.sin2.value = (0.0,)
-        self.stackRPY.selec1(0,2)
-        self.stackRPY.selec2(0,1)
-        
-        self.stackPoseRPY = Stack_of_vector('StackOscPoseRollPitchYaw')
-        self.stackPoseRPY.sin1.value = (0.0,0.0,0.0)
-        plug ( self.stackRPY.sout, self.stackPoseRPY.sin2 )
-        self.stackPoseRPY.selec1(0,3)
-        self.stackPoseRPY.selec2(0,3)
-        
-        self.poseRPYaw2Homo = PoseRollPitchYawToMatrixHomo('OscPoseRPYaw2Homo')
-        plug ( self.stackPoseRPY.sout , self.poseRPYaw2Homo.sin)
-
-        self.headRef = Multiply_of_matrixHomo('headRef')
-        self.headRef.sin1.value = self.robot.dynamic.signal('gaze').value
-        plug( self.poseRPYaw2Homo.sout, self.headRef.sin2)
-        plug( self.headRef.sout, self.features['gaze'].reference)
-    
-        self.chestRef = Multiply_of_matrixHomo('chestRef')
-        self.chestRef.sin1.value = self.robot.dynamic.signal('chest').value
-        plug( self.poseRPYaw2Homo.sout, self.chestRef.sin2)
-        plug( self.chestRef.sout, self.features['chest'].reference)
-
-        self.waistRef = Multiply_of_matrixHomo('waistRef')
-        self.waistRef.sin1.value = self.robot.dynamic.signal('waist').value
-        plug( self.poseRPYaw2Homo.sout, self.waistRef.sin2)
-        plug( self.waistRef.sout, self.features['waist'].reference)
-
-        self.setOsciFreq(1)
-        self.setOsciMagni(1)
-
 
     #------------------INIT-GAIN------------------
     def initTaskGains(self):
@@ -308,6 +242,9 @@ class Hrp2Bike(Application):
             self.push(self.taskGripper)
         self.push(self.taskHalfSitting)
 
+    #------------parameters of bike-------
+    xg=0.0; zg=0.29 #center of crank gear
+    R=0.17 #pedal-center of crank gear
 
     def goBikeSitting(self):
         self.sot.clear()
@@ -315,39 +252,71 @@ class Hrp2Bike(Application):
 #        self.push(self.tasks['chest'])
         change6dPositionReference(self.taskWaist,self.features['waist'],\
                                     self.gains['waist'],\
-                                    (-0.28,0.0,0.63,0,0,0),'111111')
+                                    (-0.22,0.0,0.58,0,0,0),'111111')
         self.push(self.taskWaist)
         if self.hands:
             self.push(self.taskGripper)
         change6dPositionReference(self.taskRH,self.features['right-wrist'],\
                                     self.gains['right-wrist'],\
-                                    #(0.3,-0.3,1.1,-pi/2,0,pi/2),'111111')
                                     (0.20,-0.255,1.0,-pi/2,0,pi/2),'111111')
         self.push(self.taskRH)
         change6dPositionReference(self.taskLH,self.features['left-wrist'],\
                                     self.gains['left-wrist'],\
-                                     #(0.3,0.3,1.1,pi/2,0,-pi/2),'111111')
                                      (0.20,0.255,1.0,pi/2,0,-pi/2),'111111')
         self.push(self.taskLH)
         change6dPositionReference(self.taskRF,self.features['right-ankle'],\
                                     self.gains['right-ankle'],\
-                                    #(0.015,-0.25,0.2,0,0,0),'111111')
                                     (0.0,-0.1125,0.12,0,0,degToRad(-8)),'111111')
         self.push(self.taskRF)
         change6dPositionReference(self.taskLF,self.features['left-ankle'],\
                                     self.gains['left-ankle'],\
-                                    #(0.015,0.25,0.2,0,0,0),'111111')
                                     (0.0,0.1125,0.46,0,0,degToRad(8)),'111111')
         self.push(self.taskLF)
         self.push(self.taskPosture)
-    def startOcillation(self):
-        self.oscillatorRoll.setActivated(True)
-        self.oscillatorPitch.setActivated(True)
 
-    def stopOcillation(self):
-        self.oscillatorRoll.setActivated(False)
-        self.oscillatorPitch.setActivated(False)
+    def stopMove(self):
+        self.rotation=False
 
+    def circle(self,nbPoint=16,rotation=True): #nbPoint=number of point to dicretise the circle
+        self.rotation=rotation
+        self.stepCircle=(2*pi)/nbPoint
+        circleL=[]
+        circleR=[]
+        for j in range(0,nbPoint):
+            circleL.append((j*self.stepCircle)+(pi/2))
+            circleR.append(-(j*self.stepCircle)+(3*pi/2))
+        self.sot.clear()
+        change6dPositionReference(self.taskWaist,self.features['waist'],\
+                                    self.gains['waist'],\
+                                    (-0.22,0.0,0.58,0,0,0),'111111')
+        self.push(self.taskWaist)
+        if self.hands:
+            self.push(self.taskGripper)
+        change6dPositionReference(self.taskRH,self.features['right-wrist'],\
+                                    self.gains['right-wrist'],\
+                                    (0.20,-0.255,1.0,-pi/2,0,pi/2),'111111')
+        self.push(self.taskRH)
+        change6dPositionReference(self.taskLH,self.features['left-wrist'],\
+                                    self.gains['left-wrist'],\
+                                     (0.20,0.255,1.0,pi/2,0,-pi/2),'111111')
+        self.push(self.taskLH)
+        #--------rotation--------
+        self.push(self.taskRF)
+        self.push(self.taskLF)
+        self.push(self.taskPosture)
+        #while self.rotation:
+        for i in range(0,nbPoint):
+            xpL=(cos(circleL[i])*self.R)+self.xg
+            zpL=(sin(circleL[i])*self.R)+self.zg
+            xpR=(cos(circleR[i])*self.R)+self.xg
+            zpR=(sin(circleR[i])*self.R)+self.zg
+            change6dPositionReference(self.taskRF,self.features['right-ankle'],\
+                                        self.gains['right-ankle'],\
+                                        (xpR,-0.1125,zpR,0,0,degToRad(-8)),'111111')
+            change6dPositionReference(self.taskLF,self.features['left-ankle'],\
+                                        self.gains['left-ankle'],\
+                                        (xpL,0.1125,zpL,0,0,degToRad(8)),'111111')
+            time.sleep(15)
     # --- SEQUENCER ---
     step=1
     def sequencer(self,stepSeq=None):
@@ -373,14 +342,14 @@ class Hrp2Bike(Application):
         #-----move start------
         elif self.step==3:
             print "Step : ", self.step
-            self.startOcillation()
-            print('Start oscillation')
+            self.circle()
+            print('Start movement')
             self.step+=1
         #-----end of move-----
         elif self.step==4:
             print "Step : ", self.step
-            self.stopOcillation()
-            print('Stop oscillation')
+            self.stopMove()
+            print('Stop movement')
             self.step+=1
         elif self.step==5:
             print "Step : ", self.step
