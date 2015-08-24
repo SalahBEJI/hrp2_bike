@@ -283,7 +283,7 @@ class Hrp2Bike(Application):
         circleL=[]
         circleR=[]
         for j in range(0,nbPoint):
-            circleL.append((j*self.stepCircle)+(pi/2))
+            circleL.append(-(j*self.stepCircle)+(pi/2))
             circleR.append(-(j*self.stepCircle)+(3*pi/2))
         self.sot.clear()
         change6dPositionReference(self.taskWaist,self.features['waist'],\
