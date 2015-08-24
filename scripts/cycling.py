@@ -316,7 +316,7 @@ class Hrp2Bike(Application):
             change6dPositionReference(self.taskLF,self.features['left-ankle'],\
                                         self.gains['left-ankle'],\
                                         (xpL,0.1125,zpL,0,0,degToRad(8)),'111111')
-            time.sleep(15)
+            time.sleep(10)
     # --- SEQUENCER ---
     step=1
     def sequencer(self,stepSeq=None):
@@ -346,12 +346,12 @@ class Hrp2Bike(Application):
             print('Start movement')
             self.step+=1
         #-----end of move-----
-        elif self.step==4:
-            print "Step : ", self.step
-            self.stopMove()
-            print('Stop movement')
-            self.step+=1
-        elif self.step==5:
+        #elif self.step==4:
+            #print "Step : ", self.step
+            #self.stopMove()
+            #print('Stop movement')
+           # self.step+=1
+        elif self.step==4:#5:
             print "Step : ", self.step
             if self.hands:
                 self.openGripper()
