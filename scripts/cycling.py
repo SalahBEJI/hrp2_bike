@@ -172,7 +172,8 @@ class Hrp2Bike(Application):
     #------------------INIT-GAIN------------------
     def initTaskGains(self):
         self.taskHalfSitting.gain.setByPoint(2,0.2,0.01,0.8)
-
+        self.taskGripper.gain.setConstant(3)
+        self.taskInitialPose.gain.setByPoint(2,0.2,0.01,0.8)
 
     #----------SOLVER------------------------------
     def initSolver(self):
@@ -294,11 +295,11 @@ class Hrp2Bike(Application):
             self.push(self.taskGripper)
         change6dPositionReference(self.taskRH,self.features['right-wrist'],\
                                     self.gains['right-wrist'],\
-                                    (0.20,-0.255,1.0,-pi/2,0,pi/2),'111111')
+                                    (0.25,-0.255,0.90,-pi/2,0,pi/2),'111111')
         self.push(self.taskRH)
         change6dPositionReference(self.taskLH,self.features['left-wrist'],\
                                     self.gains['left-wrist'],\
-                                     (0.20,0.255,1.0,pi/2,0,-pi/2),'111111')
+                                     (0.25,0.255,0.90,pi/2,0,-pi/2),'111111')
         self.push(self.taskLH)
         #--------rotation--------
         self.push(self.taskRF)
