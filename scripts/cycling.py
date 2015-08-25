@@ -144,9 +144,9 @@ class Hrp2Bike(Application):
         weight_leg       = 3
         weight_knee      = 5
         weight_chest     = 1
-        weight_chesttilt = 10
+        weight_chesttilt = 12
         weight_head      = 0.3
-        weight_arm       = 1
+        weight_arm       = 0.8
 
         weight = diag( (weight_ff,)*6 + (weight_leg,)*12 + (weight_chest,)*2 + (weight_head,)*2 + (weight_arm,)*14)
         weight[9,9] = weight_knee
@@ -258,11 +258,11 @@ class Hrp2Bike(Application):
             self.push(self.taskGripper)
         change6dPositionReference(self.taskRH,self.features['right-wrist'],\
                                     self.gains['right-wrist'],\
-                                    (0.20,-0.255,1.0,-pi/2,0,pi/2),'111111')
+                                    (0.25,-0.255,0.90,-pi/2,0,pi/2),'111111')
         self.push(self.taskRH)
         change6dPositionReference(self.taskLH,self.features['left-wrist'],\
                                     self.gains['left-wrist'],\
-                                     (0.20,0.255,1.0,pi/2,0,-pi/2),'111111')
+                                     (0.25,0.255,0.90,pi/2,0,-pi/2),'111111')
         self.push(self.taskLH)
         change6dPositionReference(self.taskRF,self.features['right-ankle'],\
                                     self.gains['right-ankle'],\
