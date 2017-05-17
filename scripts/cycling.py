@@ -21,12 +21,11 @@ def degToRad(deg):
 def change6dPositionReference(task,feature,gain,position,selec=None,ingain=None,resetJacobian=True):
     M=generic6dReference(position)
     if selec!=None:
-        if isinstance(selec,str): 
-            feature.selec.value = selec
+        if isinstance(selec,str):  feature.selec.value = selec
         else: feature.selec.value = toFlags(selec)
-            feature.reference.value = matrixToTuple(M)
-    if gain!=None:  
-        setGain(gain,ingain)
+    feature.reference.value = matrixToTuple(M)
+    if gain!=None:  setGain(gain,ingain)
+
     if 'resetJacobianDerivative' in task.__class__.__dict__.keys() and resetJacobian:
         task.resetJacobianDerivative()
 
@@ -87,7 +86,6 @@ class Hrp2Bike(Application):
         self.taskGripper     = MetaTaskKinePosture(self.robot.dynamic,'gripper')
 
         (self.tasks['trunk'],self.gains['trunk'])= self.createTrunkTask(robot, 'trunk')
-        
         self.taskRF          = self.tasks['left-ankle']
         self.taskLF          = self.tasks['right-ankle']
         self.taskCom         = self.tasks['com']
