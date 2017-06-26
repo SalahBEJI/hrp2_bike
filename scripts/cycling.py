@@ -342,6 +342,7 @@ class Hrp2Bike():
         #-----initial position------
         if self.step==0:
             print "Step : ", self.step
+            self.initTaskInitialPose()
             self.goInitialPose()
             print('Initial Pose')
             time.sleep(10)
@@ -355,6 +356,7 @@ class Hrp2Bike():
         elif self.step==2:
             print "Step : ", self.step
             if self.hands:
+                self.initTaskGripper()
                 self.closeGripper()
             print('Close Gripper')
             self.step+=1
@@ -379,7 +381,8 @@ class Hrp2Bike():
             self.step+=1
         else:
             print "Step : ", self.step
-            self.goHalfSitting()
+            #self.initTaskHalfSitting()
+            #self.goHalfSitting()
             print('Half-Sitting')
             self.step+=1
             
