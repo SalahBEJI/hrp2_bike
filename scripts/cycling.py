@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#coding:utf-8
 from dynamic_graph.sot.core import *
 from dynamic_graph.sot.core.meta_task_6d import MetaTask6d,toFlags
 from dynamic_graph.sot.core.meta_tasks_kine import *
@@ -7,12 +9,14 @@ from dynamic_graph.sot.core.meta_tasks import *
 from dynamic_graph.sot.core.meta_task_posture import MetaTaskPosture, MetaTaskKinePosture
 from dynamic_graph import plug
 from numpy import *
-from dynamic_graph.sot.application.velocity.precomputed_tasks import Application
+from dynamic_graph.sot.application.velocity.precomputed_meta_tasks import *
 from dynamic_graph.sot.tools import Oscillator, Seqplay
-from dynamic_graph.sot.dynamics.zmp_from_forces import ZmpFromForces
 import time
+import math
 
-toList = lambda sot: map(lambda x: x[2:],sot.display().split('\n')[3:-2])
+#toList = lambda sot: map(lambda x: x[2:],sot.display().split('\n')[3:-2])
+
+
 
 def degToRad(deg):
     rad=(deg*pi)/180
@@ -21,50 +25,59 @@ def degToRad(deg):
 def change6dPositionReference(task,feature,gain,position,selec=None,ingain=None,resetJacobian=True):
     M=generic6dReference(position)
     if selec!=None:
-        if isinstance(selec,str):  feature.selec.value = selec
-        else: feature.selec.value = toFlags(selec)
+        if isinstance(selec,str):  
+            feature.selec.value = selec
+        else: 
+            feature.selec.value = toFlags(selec)
     feature.reference.value = matrixToTuple(M)
-    if gain!=None:  setGain(gain,ingain)
+    if gain!=None:  
+        setGain(gain,ingain)
 
     if 'resetJacobianDerivative' in task.__class__.__dict__.keys() and resetJacobian:
         task.resetJacobianDerivative()
 
-class Hrp2Bike(Application):
+class Hrp2Bike():
 
     tracesRealTime = True
 
     initialPose = (
         # Free flyer
-        0., 0., 0., 0., 0. , 0.,
+       degToRad(0), degToRad(0), degToRad(0), degToRad(0), degToRad(0), degToRad(0),
 
         # Legs
-        0., 0., 0., 0., 0., 0.,
-        0., 0., 0., 0., 0., 0.,
+        degToRad(0), degToRad(0), degToRad(-30), degToRad(60), degToRad(-30), degToRad(0),
+        degToRad(0), degToRad(0), degToRad(-70), degToRad(35), degToRad(30), degToRad(0),
 
         # Chest and head
-        0., 0., 0., 0.,
+        degToRad(0), degToRad(20), degToRad(0), degToRad(0),
 
         # Arms
-        0., 0., 0., 0., 0., 0., 0.1,
-        0., 0.,  0., 0., 0., 0., 0.1,
+        degToRad(-70), degToRad(0), degToRad(0), degToRad(0), degToRad(-90), degToRad(0), degToRad(0),
+        degToRad(-70), degToRad(0), degToRad(0), degToRad(0), degToRad(90), degToRad(0), degToRad(0),
         )
 
     def __init__(self,robot,hands=True):#, forceSeqplay=True):
-        Application.__init__(self,robot)
-
-        self.sot=self.solver.sot
+        self.solver = Solver(robot)
+        self.sot= self.solver.sot
         self.hands=hands
-#        self.robot=robot
+        self.robot=robot
 #        self.seq=Seqplay('seqplay')
         self.createTasks(robot)
-        self.initTasks()
-        self.initTaskGains()
-        self.initSolver()
-        self.initialStack()
+#        self.initTasks()
+#        self.initTaskGains()
+#        self.initSolver()
+#        self.initialStack()
+        self.taskInitialPose = MetaTaskKinePosture(self.robot.dynamic,'initial-pose')
+        self.taskHalfSitting = MetaTaskKinePosture(self.robot.dynamic,'halfsitting')
+        self.taskGripper     = MetaTaskKinePosture(self.robot.dynamic,'gripper')
 
     def printSolver(self): #show tasks in solver controling the robot
         print self.solver
-
+       
+    def toList(self):
+        self.toList()
+        
+    
 
     #----------TASKS-------------------------------
     #------------------CREATION--------------------
@@ -81,10 +94,9 @@ class Hrp2Bike(Application):
         return (task, gain)
 
     def createTasks(self,robot):
-        self.taskHalfSitting = MetaTaskKinePosture(self.robot.dynamic,'halfsitting')
-        self.taskInitialPose = MetaTaskKinePosture(self.robot.dynamic,'initial-pose')
-        self.taskGripper     = MetaTaskKinePosture(self.robot.dynamic,'gripper')
+        createTasks(robot)
 
+        """
         (self.tasks['trunk'],self.gains['trunk'])= self.createTrunkTask(robot, 'trunk')
         self.taskRF          = self.tasks['left-ankle']
         self.taskLF          = self.tasks['right-ankle']
@@ -95,7 +107,7 @@ class Hrp2Bike(Application):
         self.taskPosture     = self.tasks['posture']
         self.taskBalance     = self.tasks['balance']
         self.taskWaist       = self.tasks['waist']
-
+        """
     def openGripper(self):
         self.taskGripper.gotoq(None,rhand=(self.gripperOpen,),lhand=(self.gripperOpen,))
 
@@ -164,7 +176,7 @@ class Hrp2Bike(Application):
         self.features['posture'].selec.value = mask
 
     def initTaskGripper(self):
-        self.gripperOpen = degToRad(30)
+        self.gripperOpen = degToRad(5)
         self.gripperClose = degToRad(3)
         self.openGripper()
 
@@ -179,14 +191,6 @@ class Hrp2Bike(Application):
     def initSolver(self):
         plug(self.sot.control,self.robot.device.control)
 
-    def push(self,task): #push task in solver 
-        if isinstance(task,str): taskName=task
-        elif "task" in task.__dict__:  taskName=task.task.name
-        else: taskName=task.name
-        if taskName not in toList(self.sot):
-            self.sot.push(taskName)
-        if taskName!="posture" and "posture" in toList(self.sot):
-            self.sot.down("posture")
 
     def removeTasks(self,task) : #remove task from solver
             if isinstance(task,str): taskName=task
@@ -216,51 +220,57 @@ class Hrp2Bike(Application):
 
     def trace(self):
         self.robot.tracer.dump()
+  
 
     #----------RUN---------------------------------
     def goInitialPose(self):
-        self.sot.clear()
+        #self.clear()
 #        self.push(self.taskBalance)
-        self.push(self.taskLF)
-        self.push(self.taskRF)
-        self.push(self.taskPosture)
-        if self.hands:
-            self.push(self.taskGripper)
-        self.push(self.taskInitialPose)
+#        self.push(self.taskLF)
+#        self.push(self.taskRF)
+#        self.push(self.taskPosture)
+#        if self.hands:
+#            self.push(self.taskGripper)
+        self.solver.sot.push(self.taskInitialPose.task.name)
 
     def initialStack(self):
-        self.push(self.taskBalance)
-        self.push(self.taskTrunk)
-        self.push(self.taskPosture)
+        self.sot.push(self.taskBalance)
+        self.sot.push(self.taskTrunk)
+        self.sot.push(self.taskPosture)
         if self.hands:
-            self.push(self.taskGripper)
+            self.sot.push(self.taskGripper)
 
     def goHalfSitting(self):
         self.sot.clear()
-        self.push(self.taskBalance)
-        self.push(self.taskPosture)
+        self.sot.push(self.taskBalance.task.name)
+        self.sot.push(self.taskPosture.task.name)
         if self.hands:
-            self.push(self.taskGripper)
-        self.push(self.taskHalfSitting)
+            self.sot.push(self.taskGripper.task.name)
+        self.sot.push(self.taskHalfSitting.name)
 
     #------------parameters of bike-------
     xg=0.0; zg=0.29 #center of crank gear
     R=0.17 #pedal-center of crank gear
 
     def goBikeSitting(self):
-        self.sot.clear()
+        pass
+        #self.clear()
 #        self.push(self.taskBalance)
 #        self.push(self.tasks['chest'])
+
+        """
         change6dPositionReference(self.taskWaist,self.features['waist'],\
                                     self.gains['waist'],\
                                     (-0.22,0.0,0.58,0,0,0),'111111')
         self.push(self.taskWaist)
         if self.hands:
             self.push(self.taskGripper)
+          
         change6dPositionReference(self.taskRH,self.features['right-wrist'],\
                                     self.gains['right-wrist'],\
                                     (0.25,-0.255,0.90,-pi/2,0,pi/2),'111111')
         self.push(self.taskRH)
+        
         change6dPositionReference(self.taskLH,self.features['left-wrist'],\
                                     self.gains['left-wrist'],\
                                      (0.25,0.255,0.90,pi/2,0,-pi/2),'111111')
@@ -274,11 +284,14 @@ class Hrp2Bike(Application):
                                     (0.0,0.1125,0.46,0,0,degToRad(8)),'111111')
         self.push(self.taskLF)
         self.push(self.taskPosture)
-
+        
     def stopMove(self):
         self.rotation=False
+        """
 
     def circle(self,nbPoint=16,rotation=True): #nbPoint=number of point to dicretise the circle
+        pass    
+        """
         self.rotation=rotation
         self.stepCircle=(2*pi)/nbPoint
         circleL=[]
@@ -286,7 +299,8 @@ class Hrp2Bike(Application):
         for j in range(0,nbPoint):
             circleL.append(-(j*self.stepCircle)+(pi/2))
             circleR.append(-(j*self.stepCircle)+(3*pi/2))
-        self.sot.clear()
+        #self.sot.clear()
+        
         change6dPositionReference(self.taskWaist,self.features['waist'],\
                                     self.gains['waist'],\
                                     (-0.22,0.0,0.58,0,0,0),'111111')
@@ -301,10 +315,10 @@ class Hrp2Bike(Application):
                                     self.gains['left-wrist'],\
                                      (0.25,0.255,0.90,pi/2,0,-pi/2),'111111')
         self.push(self.taskLH)
+        
         #--------rotation--------
         self.push(self.taskRF)
         self.push(self.taskLF)
-        self.push(self.taskPosture)
         #while self.rotation:
         for i in range(0,nbPoint):
             xpL=(cos(circleL[i])*self.R)+self.xg
@@ -318,8 +332,10 @@ class Hrp2Bike(Application):
                                         self.gains['left-ankle'],\
                                         (xpL,0.1125,zpL,0,0,degToRad(8)),'111111')
             time.sleep(5)
-    # --- SEQUENCER ---
-    step=1
+           
+    #--- SEQUENCER ---
+        """
+    step = 0
     def sequencer(self,stepSeq=None):
         if stepSeq!=None:
             self.step=stepSeq
@@ -328,12 +344,14 @@ class Hrp2Bike(Application):
             print "Step : ", self.step
             self.goInitialPose()
             print('Initial Pose')
+            time.sleep(10)
             self.step+=1
         elif self.step==1:
             print "Step : ", self.step
             self.goBikeSitting()
             print('Bike Sitting')
             self.step+=1
+            
         elif self.step==2:
             print "Step : ", self.step
             if self.hands:
@@ -346,6 +364,7 @@ class Hrp2Bike(Application):
             self.circle()
             print('Start movement')
             self.step+=1
+            
         #-----end of move-----
         #elif self.step==4:
             #print "Step : ", self.step
@@ -363,6 +382,7 @@ class Hrp2Bike(Application):
             self.goHalfSitting()
             print('Half-Sitting')
             self.step+=1
+            
     def __call__(self):
         self.sequencer()
     def __repr__(self): 
