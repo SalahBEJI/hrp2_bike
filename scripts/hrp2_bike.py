@@ -37,9 +37,3 @@ rosrun dynamic_graph_bridge run_command
 terminal.extend(['''--geometry=195x50+0+0'''])
 
 subprocess.call(terminal)
-
-
-
-
-
-
