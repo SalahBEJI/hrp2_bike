@@ -456,7 +456,7 @@ class Hrp2Bike():
             change6dPositionReference(self.taskLF,self.features['left-ankle'],\
                                         self.gains['left-ankle'],\
                                         (xpL,0.1125,zpL,0,0,degToRad(8)),'111111')
-            time.sleep(5)
+        
         """   
     #--- SEQUENCER ---
         
