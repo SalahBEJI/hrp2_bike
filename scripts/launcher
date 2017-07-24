@@ -91,7 +91,7 @@ try:
 
     while True:
         launchScript(transitionCode,'next stage')
-       # raw_input("Return to switch to next state")
+        raw_input("Return to switch to next state")
 
 except rospy.ServiceException, e:
     rospy.logerr("Service call failed: %s" % e)
