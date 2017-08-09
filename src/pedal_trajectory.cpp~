@@ -1,0 +1,167 @@
+#include <dynamic-graph/command.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/command-setter.h>
+#include <dynamic-graph/factory.h>
+
+#include "pedal_trajectory.hh"
+
+namespace dynamicgraph {
+  namespace sot {
+    namespace tools {
+      DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(PedalTrajectory,
+					 "PedalTrajectory");
+      PedalTrajectory::PedalTrajectory (const std::string& name) :
+	Entity (name),
+	soutSOUT_ ("PedalTrajectory("+name+
+		   ")::output(vector)::sout"),
+	soutdotSOUT_ ("PedalTrajectory("+name+
+		      ")::output(vector)::soutdot"),
+	 samplingPeriod_ (0.), 
+	xc_(0.15),
+	zc_(0.2),      //center of crank gear
+	R_(0.13) //pedal-center of crank gear
+      {
+	signalRegistration (soutSOUT_);
+	signalRegistration (soutdotSOUT_);
+	soutSOUT_.setFunction (boost::bind
+			       (&PedalTrajectory::computeSout,
+				this, _1, _2));
+	soutdotSOUT_.setFunction (boost::bind
+				  (&PedalTrajectory::computeSoutdot,
+				   this, _1, _2));
+	std::string docstring;
+	docstring =
+	  "  Set sampling period of control discretization.\n"
+	  "\n"
+	  "    Input:\n"
+	  "      - a floating point value.\n"
+	  "\n";
+	addCommand ("setSamplingPeriod",
+		    new command::Setter <PedalTrajectory, double>
+		    (*this, &PedalTrajectory::setSamplingPeriod, docstring));
+	docstring =
+	  "  Start tracking.\n"
+	  "\n"
+	  "    Input\n"
+	  "      - duration of the motion.\n"
+	  "\n"
+	  "\n  Read init and goal signals, compute output trajectory and"
+	  " start\n"
+	  "tracking.\n";
+	addCommand ("start",
+		    new command::Setter <PedalTrajectory, double>
+		    (*this, &PedalTrajectory::start, docstring));
+	docstring =
+	  "  Reset interpolation before calling start again\n"
+	  "\n"
+	  "    After the end of an interpolation, goal signal is copied into\n"
+	  "    sout signal. Calling reset make the entity copy init signal into\n"
+	  "    sout signal.\n";
+	addCommand ("reset",
+		    command::makeCommandVoid0 (*this,
+					       &PedalTrajectory::reset,
+					       docstring));
+
+	
+      }
+
+      PedalTrajectory::~PedalTrajectory ()
+      {
+      }
+
+      std::string PedalTrajectory::getDocString () const
+      {
+	std::string doc =
+	  "Perform a cubic interpolation in between two vectors.\n"
+	  "\n"
+	  "  Initial pose is given by signal 'init', Target position is given"
+	  " by signal\n"
+	  "  'goal'. Interpolation is performed with zero velocities at start"
+	  " and goal\n"
+	  "  positions.\n";
+	return doc;
+      }
+
+      void PedalTrajectory::reset ()
+      {
+	state_ = 0;
+      }
+
+      sot::MatrixHomogeneous & 
+	PedalTrajectory::computeSout (sot::MatrixHomogeneous& sout,
+	const int& inTime)
+      {
+      sot::MatrixHomogeneous double t;
+      t = (inTime - startTime_) * samplingPeriod_;
+      sout = p0_ + (p1_ + (p2_ + p3_*t)*t)*t;
+      if (t >= duration_) {
+	    state_ = 2;
+	  }
+	  break;
+	case 2:
+	  sout = goalSIN_.accessCopy ();
+	default:
+	  break;
+	}
+	return sout;
+      }
+
+      Vector& PedalTrajectory::computeSoutdot (Vector& soutdot,const int& inTime)
+      {
+	soutdot.resize (initSIN_.accessCopy ().size ());
+	double t;
+	switch (state_) {
+	case 0:
+	  soutdot.setZero ();
+	  break;
+	case 1:
+	  t = (inTime - startTime_) * samplingPeriod_;
+	  soutdot = p1_ + (p2_*2 + p3_*(3*t))*t;
+	  if (t >= duration_) {
+	    state_ = 2;
+	  }
+	  break;
+	case 2:
+	  soutdot.setZero ();
+	default:
+	  break;
+	}
+	return soutdot;
+      }
+
+      void PedalTrajectory::setSamplingPeriod (const double& period)
+      {
+	samplingPeriod_ = period;
+      }
+
+      void PedalTrajectory::start (const double& duration)
+      {
+	doStart (duration);
+      }
+
+      void PedalTrajectory::doStart (const double& duration)
+      {
+	// Check that sampling period has been initialized
+	if (samplingPeriod_ <= 0)
+	  throw ExceptionSignal (ExceptionSignal::NOT_INITIALIZED,
+				 "PedalTrajectory: samplingPeriod should"
+				 " be positive. Are you sure you did\n"
+				 "initialize it?");
+
+	double incrementAngle = angularVelocity_*samplingPeriod_;
+	angleLeftFoot_ += incrementAngle;
+	angleRightFoot_ += incrementAngle;
+      
+      
+      }
+      
+      /// !!! We assume that the robot is starting with a specific 
+      /// foot position: 
+      void PedalTrajectory::initStartingAngle()
+      {
+	angleLeftFoot_= -5*M_PI/6;
+	angleRightFoot_= M_PI/6;
+      }
+    } // tools
+  } // namespace sot
+} // namespace dynamicgraph
