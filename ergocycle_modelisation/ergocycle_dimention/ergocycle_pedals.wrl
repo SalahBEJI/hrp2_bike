@@ -1,0 +1,26 @@
+            #+++++++++++++++++++++++++++++++++++++++++#
+            Shape {
+	      geometry DEF box-FACES IndexedFaceSet {
+	        ccw TRUE
+	        solid TRUE
+	        colorPerVertex FALSE
+		creaseAngle 1.571
+	        coord DEF box-COORD Coordinate {
+	          point[
+	            0.00000 0.000000 0.00000, #0
+	          ]
+	        }
+	        coordIndex [ #numero vertex
+	        ]
+	      }
+#              geometry Box {
+#                  size 0.2 0.8 0.2
+#              }
+              appearance Appearance {
+                  material Material {
+                      diffuseColor 1.0 0.0 0.0
+                  }
+              }
+            }
+            #-----------------------------------------#
+

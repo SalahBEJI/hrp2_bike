@@ -1,0 +1,386 @@
+#VRML V2.0 utf8
+
+PROTO Joint [
+    exposedField     SFVec3f      center              0 0 0
+    exposedField     MFNode       children            []
+    exposedField     MFFloat      llimit              []
+    exposedField     MFFloat      lvlimit             []
+    exposedField     SFRotation   limitOrientation    0 0 1 0
+    exposedField     SFString     name                ""
+    exposedField     SFRotation   rotation            0 0 1 0
+    exposedField     SFVec3f      scale               1 1 1
+    exposedField     SFRotation   scaleOrientation    0 0 1 0
+    exposedField     MFFloat      stiffness           [ 0 0 0 ]
+    exposedField     SFVec3f      translation         0 0 0
+    exposedField     MFFloat      ulimit              []
+    exposedField     MFFloat      uvlimit             []
+    exposedField     SFString     jointType           ""
+    exposedField     SFInt32      jointId             -1
+    exposedField     SFString     jointAxis           "Z"
+
+    exposedField     SFFloat      equivalentInertia   0
+    exposedField     SFFloat      gearRatio           1
+    exposedField     SFFloat      gearEfficiency      1
+    exposedField     SFFloat      rotorInertia        0
+    exposedField     SFFloat      rotorResistor       0
+    exposedField     SFFloat      torqueConst         1
+    exposedField     SFFloat      encoderPulse        1
+]
+{
+    Transform {
+        center           IS center
+        children         IS children
+        rotation         IS rotation
+        scale            IS scale
+        scaleOrientation IS scaleOrientation
+        translation      IS translation
+    }
+}
+
+PROTO Segment [
+    field           SFVec3f     bboxCenter        0 0 0
+    field           SFVec3f     bboxSize          -1 -1 -1
+    exposedField    SFVec3f     centerOfMass      0 0 0
+    exposedField    MFNode      children          [ ]
+    exposedField    SFNode      coord             NULL
+    exposedField    MFNode      displacers        [ ]
+    exposedField    SFFloat     mass              0 
+    exposedField    MFFloat     momentsOfInertia  [ 0 0 0 0 0 0 0 0 0 ]
+    exposedField    SFString    name              ""
+    eventIn         MFNode      addChildren
+    eventIn         MFNode      removeChildren
+]
+{
+    Group {
+        addChildren    IS addChildren
+        bboxCenter     IS bboxCenter
+        bboxSize       IS bboxSize
+        children       IS children
+        removeChildren IS removeChildren
+    }
+}
+
+PROTO Humanoid [
+    field           SFVec3f    bboxCenter            0 0 0
+    field           SFVec3f    bboxSize              -1 -1 -1
+    exposedField    SFVec3f    center                0 0 0
+    exposedField    MFNode     humanoidBody          [ ]
+    exposedField    MFString   info                  [ ]
+    exposedField    MFNode     joints                [ ]
+    exposedField    SFString   name                  ""
+    exposedField    SFRotation rotation              0 0 1 0
+    exposedField    SFVec3f    scale                 1 1 1
+    exposedField    SFRotation scaleOrientation      0 0 1 0
+    exposedField    MFNode     segments              [ ]
+    exposedField    MFNode     sites                 [ ]
+    exposedField    SFVec3f    translation           0 0 0
+    exposedField    SFString   version               "1.1"
+    exposedField    MFNode     viewpoints            [ ]
+]
+{
+  Transform {
+    bboxCenter       IS bboxCenter
+    bboxSize         IS bboxSize
+    center           IS center
+    rotation         IS rotation
+    scale            IS scale
+    scaleOrientation IS scaleOrientation
+    translation      IS translation
+    children [
+      Group {
+        children IS viewpoints
+      }
+      Group {
+        children IS humanoidBody 
+      }
+    ]
+  }
+}
+
+PROTO VisionSensor [
+  exposedField SFVec3f    translation       0 0 0
+  exposedField SFRotation rotation              0 0 1 0
+  #exposedField SFRotation orientation       0 0 1 0
+  exposedField SFFloat    fieldOfView       0.785398
+  exposedField SFString   name              ""
+  exposedField SFFloat    frontClipDistance 0.01
+  exposedField SFFloat    backClipDistance  10.0
+  exposedField SFString   type              "NONE"
+  exposedField SFInt32    sensorId          -1
+  exposedField SFInt32    width             320  # 
+  exposedField SFInt32    height            240  # 
+  exposedField SFFloat    frameRate         30  
+  #exposedField MFNode       children            [] # for me
+]
+{
+  Transform {
+    rotation         IS rotation
+    translation      IS translation
+    #children IS children # for me
+  }
+}
+
+
+PROTO ForceSensor [  
+exposedField SFVec3f maxForce -1 -1 -1
+  exposedField SFVec3f maxTorque -1 -1 -1
+  exposedField SFVec3f translation 0 0 0
+  exposedField SFRotation rotation 0 0 1 0
+  exposedField SFInt32 sensorId -1
+]
+{
+  Transform {
+translation IS translation
+    rotation IS rotation
+  }
+}
+
+PROTO Gyro [
+  exposedField SFVec3f maxAngularVelocity -1 -1 -1
+  exposedField SFVec3f translation 0 0 0
+  exposedField SFRotation rotation 0 0 1 0
+  exposedField SFInt32 sensorId -1
+]
+{
+  Transform {
+    translation IS translation
+    rotation IS rotation
+  }
+}
+
+PROTO AccelerationSensor [
+  exposedField SFVec3f maxAcceleration -1 -1 -1
+  exposedField SFVec3f translation 0 0 0
+  exposedField SFRotation rotation 0 0 1 0
+  exposedField SFInt32 sensorId -1
+]
+{
+  Transform {
+    translation IS translation
+    rotation IS rotation
+  }
+}
+
+PROTO PressureSensor [
+  exposedField SFFloat maxPressure -1
+  exposedField SFVec3f translation 0 0 0
+  exposedField SFRotation rotation 0 0 1 0
+  exposedField SFInt32 sensorId -1
+]
+{
+  Transform {
+    translation IS translation
+    rotation IS rotation
+  }
+}
+
+PROTO PhotoInterrupter [
+  exposedField SFVec3f transmitter 0 0 0
+  exposedField SFVec3f receiver 0 0 0
+  exposedField SFInt32 sensorId -1
+]
+{
+  Transform{
+    children [
+      Transform{
+        translation IS transmitter
+      }
+      Transform{
+        translation IS receiver
+      }
+    ]
+  }
+}
+
+NavigationInfo {
+  avatarSize    0.5
+  headlight     TRUE
+  type  ["EXAMINE", "ANY"]
+}
+
+Background {
+  #skyColor 0.6 0.4 0.4
+  skyColor 0.4 0.6 0.4
+}
+
+Viewpoint {
+  position    3 0 0.835
+  orientation 0.5770 0.5775 0.5775 2.0935
+}
+
+DEF ERGOCYCLE Humanoid {
+humanoidBody [
+  DEF WAIST Joint {
+  jointType "fixed"
+  translation 0 0 0.0 #height from ground to ergocycle origin 
+  children [
+    DEF BASE Segment {
+    #centerOfMass -0.01435142 0.00000012 0.22007695
+    centerOfMass -0.01435142 0.00000012 0.22307695   #3mm up
+    mass 15.02949000
+    momentsOfInertia [0.16102617 -0.00000026 0.00070696 -0.00000027 0.09528000 -0.00000019 0.00070696 -0.00000020 0.19191383]
+    children [
+      Inline {
+        url "ergocycle_base.wrl"
+      }
+    ]
+    } # End of BASE
+
+
+        DEF CRANK_GEAR Joint {  #pedals axis
+        jointType "rotate"
+        jointId 0
+        jointAxis "Y"
+        translation 0 0 0.27
+        rotation 0 1 0 0
+        llimit [-2.181661565]  
+        ulimit [0.733038285]   
+        lvlimit [-4.42233]
+        uvlimit [ 4.42233]
+        equivalentInertia 0.43416
+        children [
+          DEF PEDALS Segment {
+          centerOfMass 0.00345946 -0.07794217 -0.15168400
+          mass 2.07632000
+          momentsOfInertia [0.02619757 -0.00003954 0.00057351 -0.00003954 0.02492350 0.00067007 0.00057351 0.00067008 0.00376439]
+          children [
+            Inline {
+              url "ergocycle_pedals.wrl"
+            }
+          ]
+          } # End of PEDALS
+
+
+		DEF PEDALS_AXIS_R Joint {  #pedals axis
+		jointType "rotate"
+		jointId 4
+		jointAxis "Y"
+		translation 0 0 -0.17
+		rotation 0 1 0 0
+		llimit [-2.181661565]  
+		ulimit [0.733038285]   
+		lvlimit [-4.42233]
+		uvlimit [ 4.42233]
+		equivalentInertia 0.43416
+		children [
+		  DEF PEDALS_R Segment {
+		  centerOfMass 0.00345946 -0.07794217 -0.15168400
+		  mass 2.07632000
+		  momentsOfInertia [0.02619757 -0.00003954 0.00057351 -0.00003954 0.02492350 0.00067007 0.00057351 0.00067008 0.00376439]
+		  children [
+		    Inline {
+		      url "ergocycle_pedals_R.wrl"
+		    }
+		  ]
+		  } # End of PEDALS_R
+		]
+		} # End of PEDALS_AXIS_R
+
+		DEF PEDALS_AXIS_L Joint {  #pedals axis
+		jointType "rotate"
+		jointId 5
+		jointAxis "Y"
+		translation 0 0 0.17
+		rotation 0 1 0 0
+		llimit [-2.181661565]  
+		ulimit [0.733038285]   
+		lvlimit [-4.42233]
+		uvlimit [ 4.42233]
+		equivalentInertia 0.43416
+		children [
+		  DEF PEDALS_L Segment {
+		  centerOfMass 0.00345946 -0.07794217 -0.15168400
+		  mass 2.07632000
+		  momentsOfInertia [0.02619757 -0.00003954 0.00057351 -0.00003954 0.02492350 0.00067007 0.00057351 0.00067008 0.00376439]
+		  children [
+		    Inline {
+		      url "ergocycle_pedals_L.wrl"
+		    }
+		  ]
+		  } # End of PEDALS_L
+		]
+		} # End of PEDALS_AXIS_L
+        ]
+        } # End of PEDALS_AXIS
+
+ 	DEF SADDLE_JOINT Joint { #saddle axis
+        jointType "fixed"
+        jointId 1
+        translation 0.0 0.0 -0.0 #modif origin of saddle
+        children [
+          DEF SADDLE Segment {
+          centerOfMass -0.00989448 0.04645260 -0.00015316
+          mass 0.81007573
+          momentsOfInertia [0.00221115 -0.00030424 0.00000147 -0.00030424 0.00184189 0.00004667 0.00000147 0.00004667 0.00344772]
+          children [
+            Inline {
+              url "ergocycle_saddle.wrl"
+            }
+          ]
+          } # End of SADDLE
+        ]
+        } # End of SADDLE_JOINT
+
+
+ 	DEF SUPP_HANDLEBAR_JOINT Joint { #handlebar support axis
+        jointType "fixed"
+        jointId 2
+        translation -0.0 0.0 -0.0 #modif origin of supp_handlebar
+        children [
+          DEF SUPP_HANDLEBAR Segment {
+          centerOfMass -0.00989448 0.04645260 -0.00015316
+          mass 0.81007573
+          momentsOfInertia [0.00221115 -0.00030424 0.00000147 -0.00030424 0.00184189 0.00004667 0.00000147 0.00004667 0.00344772]
+          children [
+            Inline {
+              url "ergocycle_supp_handlebar.wrl"
+            }
+          ]
+          } # End of SUPP_HANDLEBAR
+
+
+	 	DEF HANDLEBAR_JOINT Joint { #handlebar axis
+		jointType "fixed"
+		jointId 3
+		translation -0.0 0.0 -0.0 #modif origin of handlebar
+		children [
+		  DEF HANDLEBAR Segment {
+		  centerOfMass -0.00989448 0.04645260 -0.00015316
+		  mass 0.81007573
+		  momentsOfInertia [0.00221115 -0.00030424 0.00000147 -0.00030424 0.00184189 0.00004667 0.00000147 0.00004667 0.00344772]
+		  children [
+		    Inline {
+		      url "ergocycle_handlebar.wrl"
+		    }
+		  ]
+		  } # End of HANDLEBAR
+		]
+		} # End of HANDLEBAR_JOINT
+        ]
+        } # End of SUPP_HANDLEBAR_JOINT
+
+  ]
+  } # End of [humanoidBody] WAIST
+]
+
+
+joints [
+    USE WAIST,
+    USE CRANK_GEAR,
+    USE PEDALS_AXIS_R,
+    USE PEDALS_AXIS_L,
+    USE SADDLE_JOINT,
+    USE SUPP_HANDLEBAR_JOINT,
+    USE HANDLEBAR_JOINT
+] #joints
+
+segments [
+    USE BASE,
+    USE PEDALS,
+    USE PEDALS_R
+    USE PEDALS_L
+    USE SADDLE
+    USE SUPP_HANDLEBAR
+    USE HANDLEBAR
+] #segments
+} #of DEF HRP2 Humanoid

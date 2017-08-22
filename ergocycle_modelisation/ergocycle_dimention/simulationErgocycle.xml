@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<grxui>
+    <mode name="Simulation">
+        <item class="com.generalrobotix.ui.item.GrxWorldStateItem" name="simulation0" select="true">
+            <property name="integrate" value="true"/>
+            <property name="viewsimulate" value="false"/>
+            <property name="totalTime" value="70.0 "/>
+            <property name="timeStep" value="0.0010 "/>
+            <property name="gravity" value="9.8 "/>
+            <property name="method" value="RUNGE_KUTTA"/>
+        </item>
+        <item class="com.generalrobotix.ui.item.GrxWorldStateItem" name="worldstate0" select="true">
+            <property name="logTimeStep" value="0.0010 "/>
+        </item>
+        <item class="com.generalrobotix.ui.item.GrxModelItem" name="HRP2LAAS" select="true" url="/opt/openrobots/share/hrp2-14/HRP2JRLBush_main.wrl">
+            <property name="isRobot" value="true"/>
+            <property name="controller" value="HRP2PDController"/>
+            <property name="controlTime" value="0.0010"/>
+        <property name="setupDirectory" value="/opt/grx/HRP2LAAS/bin"/>
+        <property name="setupCommand" value="HRPController.sh"/>
+            <property name="markRadius" value="0.05 "/>
+            <property name="WAIST.translation" value="-0.28 0.0 0.73 "/>
+            <property name="WAIST.rotation" value="0.0 1.0 0.0 0.0 "/>
+            <property name="WAIST.angle" value="0.0"/>
+            <property name="RLEG_JOINT0.angle" value="0.0"/>
+            <property name="RLEG_JOINT1.angle" value="0.0"/>
+            <property name="RLEG_JOINT2.angle" value="-0.85"/>
+            <property name="RLEG_JOINT3.angle" value="0.85"/>
+            <property name="RLEG_JOINT4.angle" value="-0.0"/>
+            <property name="RLEG_JOINT5.angle" value="0.0"/>
+            <property name="RLEG_BUSH_ROLL.angle" value="0.0"/>
+            <property name="RLEG_BUSH_PITCH.angle" value="0.0"/>
+            <property name="RLEG_BUSH_Z.angle" value="0.0"/>
+            <property name="LLEG_JOINT0.angle" value="0.0"/>
+            <property name="LLEG_JOINT1.angle" value="0.0"/>
+            <property name="LLEG_JOINT2.angle" value="-1.8"/>
+            <property name="LLEG_JOINT3.angle" value="1.75"/>
+            <property name="LLEG_JOINT4.angle" value="0.0"/>
+            <property name="LLEG_JOINT5.angle" value="0.0"/>
+            <property name="LLEG_BUSH_ROLL.angle" value="0.0"/>
+            <property name="LLEG_BUSH_PITCH.angle" value="0.0"/>
+            <property name="LLEG_BUSH_Z.angle" value="0.0"/>
+            <property name="CHEST_JOINT0.angle" value="0.0"/>
+            <property name="CHEST_JOINT1.angle" value="0.57"/>
+            <property name="HEAD_JOINT0.angle" value="0.0"/>
+            <property name="HEAD_JOINT1.angle" value="0.0"/>
+            <property name="RARM_JOINT0.angle" value="-1.0"/>
+            <property name="RARM_JOINT1.angle" value="0.0"/>
+            <property name="RARM_JOINT2.angle" value="0.0"/>
+            <property name="RARM_JOINT3.angle" value="-0.6236"/>
+            <property name="RARM_JOINT4.angle" value="1.6"/>
+            <property name="RARM_JOINT5.angle" value="0.0"/>
+            <property name="RARM_JOINT6.angle" value="0.78"/>
+            <property name="LARM_JOINT0.angle" value="-1.0"/>
+            <property name="LARM_JOINT1.angle" value="0.0"/>
+            <property name="LARM_JOINT2.angle" value="0.0"/>
+            <property name="LARM_JOINT3.angle" value="-0.6236"/>
+            <property name="LARM_JOINT4.angle" value="-1.6"/>
+            <property name="LARM_JOINT5.angle" value="0.0"/>
+            <property name="LARM_JOINT6.angle" value="0.78"/>
+        </item>
+        <item class="com.generalrobotix.ui.item.GrxModelItem" name="ergocycle" select="true" url="/home/sbeji/ergocycle_modelisation/ergocycle_dimention/ergocycle_main.wrl">
+            <property name="isRobot" value="false"/>
+            <property name="WAIST.rotation" value="0.0 1.0 0.0 0.0 "/>
+            <property name="WAIST.translation" value="0.0 0.0 0.0 "/>
+        </item>
+        <item class="com.generalrobotix.ui.item.GrxCollisionPairItem" name="CP#ergocycle#HRP2LAAS" select="true">
+            <property name="springConstant" value="100000 100000 100000 800 800 800"/>
+            <property name="slidingFriction" value="0.5"/>
+            <property name="sprintDamperModel" value="false"/>
+            <property name="damperConstant" value="100000 100000 100000 800 800 800"/>
+            <property name="objectName2" value="HRP2LAAS"/>
+            <property name="objectName1" value="ergocycle"/>
+            <property name="staticFriction" value="0.5"/>
+        </item>
+        <item class="com.generalrobotix.ui.item.GrxPythonScriptItem" name="sample" select="true" url="/home/sbeji/ergocycle_modelisation/script/ergocycle_dimension.py">
+        </item>
+    </mode>
+</grxui>
