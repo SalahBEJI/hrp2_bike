@@ -8,6 +8,7 @@ from dynamic_graph.sot.core.matrix_util import matrixToTuple, vectorToTuple,rota
 from dynamic_graph.sot.core.meta_tasks import *
 from dynamic_graph.sot.core.meta_task_posture import MetaTaskPosture, MetaTaskKinePosture
 from dynamic_graph import plug
+from dynamic_graph.sot.hrp2_bike import *
 from numpy import *
 from dynamic_graph.sot.application.velocity.precomputed_meta_tasks import *
 from dynamic_graph.sot.tools import Oscillator, Seqplay
@@ -86,7 +87,7 @@ class Hrp2Bike():
         self.taskHalfSitting.gain.setByPoint(2,0.2,0.01,0.8)
         self.taskGripper.gain.setConstant(3)
         self.taskInitialPose.gain.setByPoint(3,3.2,3.01,3.8)
-        
+        self.apedaltrajectory=PedalTrajectory("pedaltrajectory")
         """
         robot.mTasks['com'] = MetaTaskKineCom(robot.dynamic)
         """
@@ -308,10 +309,7 @@ class Hrp2Bike():
         self.sot.push(self.taskHalfSitting.name)
 
     #------------parameters of bike-------
-    xc=0.21; zc=-0,121566
-     #center of crank gear
-    R=1.5 #pedal-center of crank gear
-
+    
 
     def taskRightFoot(self):
         
@@ -393,7 +391,7 @@ class Hrp2Bike():
         
         xc=0.15
         zc=0.2
-        R=0.13
+        R=0.12
         
         for i in range(0,nbPoint):
             xpR=((cos(circleR[i])*R)+xc)
@@ -425,7 +423,11 @@ class Hrp2Bike():
 
     def Circle(self):
 
-        #self.solver.sot.addContact(self.robot.contactLF)
+        plug(self.apedaltrajectory.soutRF,self.robot.contactRF.featureDes.position)
+        plug(self.apedaltrajectory.soutLF,self.robot.contactLF.featureDes.position)
+        self.robot.contactRF.gain.set(100,0,0)
+        self.robot.contactLF.gain.set(100,0,0)
+        #selfrobot.contactRF.gain.set(0,0,100).solver.sot.addContact(self.robot.contactLF)
         #self.solver.sot.addContact(self.robot.contactRF)
         #self.sot.clear()
         #self.solver.sot.push(self.robot.contactLF.task.name)
@@ -469,7 +471,7 @@ class Hrp2Bike():
             print "Step : ", self.step
             self.goInitialPose()
             print('Initial Pose')
-            self.step+=4
+            self.step+=5
         elif self.step==1:
             print "Step : ", self.step
             self.goBikeSitting()
@@ -500,6 +502,14 @@ class Hrp2Bike():
             #self.InitCircle()
             #self.Circle()
             print('Start Cycling')
+            self.step+=0
+        elif self.step==5:
+            print "Step : ", self.step
+            self.Circle()
+            #self.taskLeftFoot()
+            #self.InitCircle()
+            #self.Circle()
+            print('Start movement')
             self.step+=0
         #-----end of move-----
         #elif self.step==4:
