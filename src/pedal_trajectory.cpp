@@ -1,6 +1,9 @@
 #include <dynamic-graph/command.h>
 #include <dynamic-graph/command-bind.h>
 #include <dynamic-graph/command-setter.h>
+#include <dynamic-graph/command-getter.h>
+#include <dynamic-graph/command-direct-setter.h>
+#include <dynamic-graph/command-direct-getter.h>
 #include <dynamic-graph/factory.h>
 
 #include "pedal_trajectory.hh"
@@ -13,13 +16,14 @@ namespace dynamicgraph {
       PedalTrajectory::PedalTrajectory (const std::string& name) :
 	Entity (name),
 	soutRFSOUT_ ("PedalTrajectory("+name+
-		   ")::output(vector)::soutRF"),
+		   ")::output(MatrixHomogeneous)::soutRF"),
 	soutLFSOUT_ ("PedalTrajectory("+name+
-		      ")::output(vector)::soutLF"),
-	 samplingPeriod_ (0.), 
+		      ")::output(MatrixHomogeneous)::soutLF"),
+	samplingPeriod_ (0.), 
+	angularVelocity_(0.),
 	xc_(0.15),
-	zc_(0.2),      //center of crank gear
-	R_(0.13) //pedal-center of crank gear
+	zc_(0.2), //center of crank gear
+	R_(0.12) //pedal-center of crank gear
       {
 	signalRegistration (soutRFSOUT_);
 	signalRegistration (soutLFSOUT_);
@@ -52,6 +56,30 @@ namespace dynamicgraph {
 		    new command::Setter <PedalTrajectory, double>
 		    (*this, &PedalTrajectory::start, docstring));
 
+	addCommand ("getAngleLeftFoot",
+            command::makeDirectGetter (*this, &angleLeftFoot_,
+                              command::docDirectGetter ("Get angle left foot",
+                              "double")));
+
+    addCommand ("getAngleRightFoot",
+            command::makeDirectGetter (*this, &angleRightFoot_,
+                              command::docDirectGetter ("Get angle right foot",
+                              "double")));
+
+	addCommand ("getSamplingPeriod",
+            command::makeDirectGetter (*this, &samplingPeriod_,
+                              command::docDirectGetter ("Get sampling period",
+                              "double")));
+
+	addCommand ("getAngularVelocity",
+            command::makeDirectGetter (*this, &angularVelocity_,
+                              command::docDirectGetter ("Get angular velocity",
+                              "double")));
+	addCommand ("setAngularVelocity",
+            command::makeDirectSetter (*this, &angularVelocity_,
+                              command::docDirectSetter ("Set angular velocity",
+                              "double")));
+	
 	initStartingAngles();
       }
 
@@ -77,6 +105,7 @@ namespace dynamicgraph {
       PedalTrajectory::computeLFSout (sot::MatrixHomogeneous& sout,
 				    const int&)
       {
+    sout(0,1) = 0.;
 	sout(0,0) = 1.0; sout(1,1)=1.0; sout(2,2)=1.0; sout(3,3)=1.0;
 	double incrementAngle = angularVelocity_*samplingPeriod_;
 	angleLeftFoot_ -= incrementAngle;
@@ -90,6 +119,7 @@ namespace dynamicgraph {
       PedalTrajectory::computeRFSout (sot::MatrixHomogeneous& sout,
 				    const int& )
       {
+    sout(0,1) = 0.;
 	sout(0,0) = 1.0; sout(1,1)=1.0; sout(2,2)=1.0; sout(3,3)=1.0;
 	double incrementAngle = angularVelocity_*samplingPeriod_;
 	angleRightFoot_ -= incrementAngle;
