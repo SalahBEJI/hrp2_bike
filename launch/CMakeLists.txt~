@@ -1,0 +1,10 @@
+# Generate the configure file for openhrp2_launch
+	
+configure_file( ${CMAKE_SOURCE_DIR}/launch/openhrp3_hrp2.launch.in ${CMAKE_BINARY_DIR}/launch/openhrp3_hrp2.launch)
+install(FILES 
+  ${CMAKE_BINARY_DIR}/launch/openhrp3_hrp2.launch 
+  openhrp3_hrp2_bush.launch 
+  openhrp3_hrp2_nobush.launch
+  openhrp3_hrp2_nobush_seq.launch
+  DESTINATION 
+  ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)

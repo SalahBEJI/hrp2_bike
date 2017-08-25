@@ -1,0 +1,46 @@
+<launch>
+2	
+  <arg name="openhrpprojectname" default="simulationMode"/>
+3	
+4	
+  <machine 
+5	
+    name="localmachine"
+6	
+    address="localhost"
+7	
+    env-loader="$(find openhrp3_hrp2)/scripts/env.sh"
+8	
+    default="true">
+9	
+  </machine>	
+10	
+11	
+  <node name="openhrp_model_loader" pkg="openhrp3_simulator_wo_rtm" type="openhrp-model-loader" />
+12	
+13	
+  <node name="collision_detector" pkg="openhrp3_simulator_wo_rtm" type="openhrp-collision-detector" />
+14	
+15	
+  <node machine="localmachine" name="dynamic_simulator" pkg="openhrp3_hrp2" type="start_openhrp_aist_dynamics_simulator"		
+16	
+  />
+17	
+18	
+  <node name="hrpsys_viewer" pkg="openhrp3_simulator_wo_rtm" type="start_hrpsys_viewer" />
+19	
+20	
+  <node name="controller_hrp2" pkg="openhrp3_hrp2" type="controller-hrp2" 
+21	
+    args="@SOT_HRP2_LIBDIR@/libsot-hrp2-14-controller.so @CMAKE_INSTALL_PREFIX@/example/openhrp3_hrp2/scheduler/etc/PIDgains.dat"
+22	
+  />
+23	
+24	
+  <node name="scheduler_project" pkg="openhrp3_simulator_wo_rtm" type="schedulerproject" 
+25	
+    args="-url @CMAKE_INSTALL_PREFIX@/share/openhrp3_hrp2/project/$(arg openhrpprojectname).xml"
+26	
+  />
+27	
+</launch>
