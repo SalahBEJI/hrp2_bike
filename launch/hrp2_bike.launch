@@ -20,7 +20,7 @@
 
   <!-- Initialize the SoT -->
   <node pkg="hrp2_bike" type="launcher" name="launcher">
-    <param name="~simulation" value="$(arg simulation)" />
+  <param name="~simulation" value="$(arg simulation)" />
   </node>
 
 

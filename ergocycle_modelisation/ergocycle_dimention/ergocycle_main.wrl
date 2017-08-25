@@ -255,7 +255,7 @@ humanoidBody [
 		jointType "rotate"
 		jointId 4
 		jointAxis "Y"
-		translation 0 0 -0.17
+		translation 0.12 0 0
 		rotation 0 1 0 0
 		llimit [-2.181661565]  
 		ulimit [0.733038285]   
@@ -280,7 +280,7 @@ humanoidBody [
 		jointType "rotate"
 		jointId 5
 		jointAxis "Y"
-		translation 0 0 0.17
+		translation -0.12 0 0
 		rotation 0 1 0 0
 		llimit [-2.181661565]  
 		ulimit [0.733038285]   

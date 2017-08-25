@@ -21,11 +21,17 @@ SETUP_PROJECT()
 SEARCH_FOR_EIGEN()
 
 ADD_REQUIRED_DEPENDENCY("sot-application")
+ADD_REQUIRED_DEPENDENCY("sot-core")
+add_required_dependency("sot-hrp2")
+
+# Go to src directory to compile SoT entities
+add_subdirectory(src)
 
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+
 
 add_service_files(
    FILES
@@ -37,6 +43,11 @@ generate_messages(
   std_msgs
 )
 
+catkin_package(CATKIN_DEPENDS roscpp )
+
+add_subdirectory(launch)
+
+# Installation procedure of python files to run the experiments or the simulations
 INSTALL(FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/scripts/cycling.py
   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python2.7/site-packages/dynamic_graph/sot/application #Put your own path to the installation directory
@@ -48,7 +59,7 @@ INSTALL(FILES
   )
 
 
-INSTALL(DIRECTORY launch rviz_cfg scripts
+INSTALL(DIRECTORY rviz_cfg scripts project
   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME} #Put your own path to the installation directory
   )
 

@@ -31,6 +31,7 @@
             <property name="RLEG_BUSH_ROLL.angle" value="0.0"/>
             <property name="RLEG_BUSH_PITCH.angle" value="0.0"/>
             <property name="RLEG_BUSH_Z.angle" value="0.0"/>
+
             <property name="LLEG_JOINT0.angle" value="0.0"/>
             <property name="LLEG_JOINT1.angle" value="0.0"/>
             <property name="LLEG_JOINT2.angle" value="-1.8"/>
@@ -59,7 +60,7 @@
             <property name="LARM_JOINT5.angle" value="0.0"/>
             <property name="LARM_JOINT6.angle" value="0.78"/>
         </item>
-        <item class="com.generalrobotix.ui.item.GrxModelItem" name="ergocycle" select="true" url="/home/sbeji/ergocycle_modelisation/ergocycle_dimention/ergocycle_main.wrl">
+        <item class="com.generalrobotix.ui.item.GrxModelItem" name="ergocycle" select="true" url="/home/sbeji/catkin_ws/src/hrp2_bike/ergocycle_modelisation/ergocycle_dimention/ergocycle_main.wrl">
             <property name="isRobot" value="false"/>
             <property name="WAIST.rotation" value="0.0 1.0 0.0 0.0 "/>
             <property name="WAIST.translation" value="0.0 0.0 0.0 "/>
@@ -73,7 +74,7 @@
             <property name="objectName1" value="ergocycle"/>
             <property name="staticFriction" value="0.5"/>
         </item>
-        <item class="com.generalrobotix.ui.item.GrxPythonScriptItem" name="sample" select="true" url="/home/sbeji/ergocycle_modelisation/script/ergocycle_dimension.py">
+        <item class="com.generalrobotix.ui.item.GrxPythonScriptItem" name="sample" select="true" url="/home/sbeji/catkin_ws/src/hrp2_bike/ergocycle_modelisation/script/ergocycle_dimension.py">
         </item>
     </mode>
 </grxui>

@@ -57,7 +57,7 @@
             <property name="LARM_JOINT3.angle" value="-0.6236"/>
             <property name="LARM_JOINT4.angle" value="-1.6"/>
             <property name="LARM_JOINT5.angle" value="0.0"/>
-            <property name="LARM_JOINT6.angle" value="0.78"/>
+            <property name="LARM_JOINT6.angle" value="0.0"/>
         </item>
         <item class="com.generalrobotix.ui.item.GrxModelItem" name="ergocycle" select="true" url="/home/sbeji/ergocycle_modelisation/ergocycle_dimention/ergocycle_main.wrl">
             <property name="isRobot" value="false"/>
