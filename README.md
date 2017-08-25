@@ -1,8 +1,10 @@
 # hrp2_bike
 
-##Install
+##Install :
+
     cd build
     make install
 
-##Launching 
+##Launching :
+
     roslaunch hrp2_bike openhrp3_hrp2_bike_nobush.launch
