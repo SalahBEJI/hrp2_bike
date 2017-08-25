@@ -1,0 +1,5 @@
+<launch>
+  <include file="$(find openhrp3_hrp2)/launch/openhrp3_hrp2.launch" >
+    <arg name="openhrpprojectname" value="simulationHrp2BikeNoBush"/>
+  </include>
+</launch>

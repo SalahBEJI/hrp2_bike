@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<grxui>
+    <mode name="Simulation">
+        <item class="com.generalrobotix.ui.item.GrxSimulationItem" name="simulation0" select="true">
+            <property name="integrate" value="true"/>
+            <property name="viewsimulate" value="false"/>
+            <property name="totalTime" value="70.0 "/>
+            <property name="timeStep" value="0.0010 "/>
+            <property name="gravity" value="9.8 "/>
+            <property name="method" value="RUNGE_KUTTA"/>
+        </item>
+        <item class="com.generalrobotix.ui.item.GrxWorldStateItem" name="worldstate0" select="true">
+            <property name="logTimeStep" value="0.0010 "/>
+        </item>
+        <item class="com.generalrobotix.ui.item.GrxModelItem" name="HRP2JRL" select="true" url="/opt/openrobots/share/hrp2-14/HRP2JRLmain.wrl">
+            <property name="isRobot" value="true"/>
+            <property name="controller" value="HRP2PDController"/>
+            <property name="controlTime" value="0.0010"/>
+            <property name="setupDirectory" value="/opt/grx/HRP2LAAS/bin"/>
+            <property name="setupCommand" value="HRPController.sh"/>
+            <property name="markRadius" value="0.05 "/>
+            <property name="WAIST.translation" value="-0.32 0.0 0.6487"/>
+            <property name="WAIST.rotation" value="0.0 1.0 0.0 0.0 "/>
+	    <property name="RLEG_JOINT0.angle" value="0.0"/>
+	    <property name="RLEG_JOINT1.angle" value="0.0"/>
+	    <property name="RLEG_JOINT2.angle" value="-1.17"/>
+	    <property name="RLEG_JOINT3.angle" value="0.62"/>
+	    <property name="RLEG_JOINT4.angle" value="0.5"/>
+	    <property name="RLEG_JOINT5.angle" value="0.0"/>
+
+	    <property name="LLEG_JOINT0.angle" value="0.0"/>
+	    <property name="LLEG_JOINT1.angle" value="0.0"/>
+	    <property name="LLEG_JOINT2.angle" value="-1.3"/>
+	    <property name="LLEG_JOINT3.angle" value="1.55"/>
+	    <property name="LLEG_JOINT4.angle" value="-0.2"/>
+	    <property name="LLEG_JOINT5.angle" value="0.0"/>
+
+	    <property name="CHEST_JOINT0.angle" value="0.0"/>
+	    <property name="CHEST_JOINT1.angle" value="0.5"/>
+	    <property name="HEAD_JOINT0.angle" value="0.0"/>
+	    <property name="HEAD_JOINT1.angle" value="0.0"/>
+
+	    <property name="RARM_JOINT0.angle" value="-1.08"/>
+	    <property name="RARM_JOINT1.angle" value="0.05"/>
+	    <property name="RARM_JOINT2.angle" value="0.0"/>
+	    <property name="RARM_JOINT3.angle" value="-0.5326"/>
+	    <property name="RARM_JOINT4.angle" value="1.5708"/>
+	    <property name="RARM_JOINT5.angle" value="0.0"/>
+	    <property name="RARM_JOINT6.angle" value="0.1"/>
+
+	    <property name="LARM_JOINT0.angle" value="-1.08"/>
+	    <property name="LARM_JOINT1.angle" value="-0.05"/>
+	    <property name="LARM_JOINT2.angle" value="0.0"/>
+	    <property name="LARM_JOINT3.angle" value="-0.5326"/>
+	    <property name="LARM_JOINT4.angle" value="-1.5708"/>
+	    <property name="LARM_JOINT5.angle" value="0.0"/>
+	    <property name="LARM_JOINT6.angle" value="0.1"/>
+        </item>
+        <item class="com.generalrobotix.ui.item.GrxModelItem" name="ERGOCYCLE" select="true" url="/home/sbeji/catkin_ws/src/hrp2_bike/ergocycle_modelisation/ergocycle_dimention/ergocycle_main.wrl">
+            <property name="isRobot" value="false"/>
+            <property name="WAIST.rotation" value="0.0 1.0 0.0 0.0 "/>
+            <property name="WAIST.translation" value="0.0 0.0 -0.1 "/>
+        </item>
+        <item class="com.generalrobotix.ui.item.GrxCollisionPairItem" name="CP#floor#HRP2LAAS" select="true">
+            <property name="objectName1" value="HRP2JRL"/>
+            <property name="objectName2" value="ERGOCYCLE"/>
+            <property name="staticFriction" value="0.5"/>
+            <property name="slidingFriction" value="0.5"/>
+        </item>
+    </mode>
+</grxui>
