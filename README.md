@@ -1,11 +1,8 @@
 # hrp2_bike
 
 ##Install
-    rosmake hrp2_bike
+    cd build
+    make install
 
-    mkdir _build & cd _build
-    cmake ..
-    make DESTDIR=/path/to/sot/install/directory install
-
-##Launching script
-    rosrun hrp2_bike hrp2_bike.py
+##Launching 
+    roslaunch hrp2_bike openhrp3_hrp2_bike_nobush.launch
